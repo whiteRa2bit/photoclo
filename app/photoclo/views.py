@@ -68,7 +68,7 @@ def sign_up(request):
 
 @csrf_exempt
 @api_view(["POST"])
-@permission_classes((IsAuthenticated,))
+@permission_classes((AllowAny,))
 def sign_out(request):
     logout(request)
     return Response(status=HTTP_200_OK)
