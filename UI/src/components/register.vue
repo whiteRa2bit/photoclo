@@ -1,0 +1,230 @@
+<template>
+    <form id="register" align="center">
+        <h1>Регистрация</h1>
+        <div class="inputFields">
+            <span v-if="empty" class="error">*Все поля должны быть заполнены.</span>
+            <span v-if="incorrect" class="error">*Такой пользователь уже существует.</span>
+            <div class="user-input-wrp">
+                <br/>
+                <input type="text" class="input" id="loginField" name="username" v.model="input.username" v-on:change="updateUsername" autofocus required align="center"/>
+                <span class="floating-label">Логин</span>
+            </div>
+            <div class="user-input-wrp">
+                <br/>
+                <input type="password" class="input" id="passwordField" name="password" v.model="input.password" v-on:change="updatePassword" required/>
+                <span class="floating-label">Пароль</span>
+            </div>
+            <div class="user-input-wrp">
+                <br/>
+                <input type="text" class="input" id="emailField" name="email" v.model="input.email" v-on:change="updateEmail" autofocus required/>
+                <span class="floating-label">Электронная почта</span>
+            </div>
+            <button class="button" id="registerButton" form="register" type="button" v-on:click="register()"><span>Регистрация</span></button>
+        </div>
+        <button class="button" id="loginButton" form="register" type="button" v-on:click="toLoginPage()">Уже есть аккаунт? Войти.</button>
+    </form>
+</template>
+
+<script>
+    import axios from 'axios';
+    export default {
+        name: 'Register',
+        data() {
+            return {
+                empty: true,
+                correct: true,
+                incorrect: false,
+                input: {
+                    username: "",
+                    password: "",
+                    email: ""
+                }
+            }
+        },
+        methods: {
+            register() {
+                var this_ = this;
+                if(!this.empty) {
+                    axios.post('/api/sign_up/', {username: this.input.username, password: this.input.password, email: this.input.email}).then(function (response) {
+                        localStorage.token = response.data.token;
+                        this_.$emit("authenticated", true);
+                        this_.$router.replace({ name: "secure" });
+                    }).catch(function () {
+                        this_.incorrect = true;
+                    })
+                }
+            },
+            toLoginPage() {
+                this.$router.replace({ name: "login" });
+            },
+            updateUsername(event) {
+                this.input.username = event.target.value;
+                this.incorrect = false;
+                if (!(this.input.username != "" && this.input.password != "" && this.input.email != "")) {
+                    this.empty = true;
+                }
+                else {
+                    this.empty = false;
+                }
+            },
+            updatePassword(event) {
+                this.input.password = event.target.value;
+                this.incorrect = false;
+                if (!(this.input.username != "" && this.input.password != "" && this.input.email != "")) {
+                    this.empty = true;
+                }
+                else {
+                    this.empty = false;
+                }
+            },
+            updateEmail(event) {
+                this.input.email = event.target.value;
+                this.incorrect = false;
+                if (!(this.input.username != "" && this.input.password != "" && this.input.email != "")) {
+                    this.empty = true;
+                }
+                else {
+                    this.empty = false;
+                }
+            }
+        }
+    }
+</script>
+
+<style scoped>
+    #register {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        width: 30%;
+        min-width: 300px;
+        border: 1px solid #CCCCCC;
+        background-color: #FFFFFF;
+        margin: auto;
+        margin-top: 5vh;
+        min-height: 350px;
+        height: 80vh;
+        padding: 20px;
+        font: 20px Calibri;
+    }
+
+    .input {
+        font: 20px Calibri;
+        border-left: 0px;
+        border-right: 0px;
+        border-top: 0px;
+        border-bottom: 1px solid #3A78DE;
+    }
+
+    .button {
+        width: 75%;
+        font: 20px Calibri;
+        color: #FFFFFF;
+        background-color: #FFF;
+        border-radius: 2px;
+        margin-top: 10px;
+        padding: 4px;
+        border: 0px;
+        margin: 10px;
+        cursor: pointer;
+        outline: none !important;
+    }
+
+    button:hover {
+        opacity: 0.8;
+    }
+
+    button:focus {
+        outline: none !important
+    }
+
+    #registerButton {
+        width: 75%;
+        background-color: #3A78DE;
+        color: white;
+        box-shadow: 0.1em 0.1em 5px rgba(122,122,122,0.5);
+        transition: all 0.5s;
+        cursor: pointer;
+    }
+    #registerButton span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    #registerButton span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+    }
+
+    #registerButton:hover span {
+        padding-right: 25px;
+    }
+
+    #registerButton:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+
+    #loginButton{
+        margin-top: 10px;
+        text-align: left;
+        font-size: 15px;
+        color: #3A78DE;
+    }
+
+    input:focus {
+        outline: none !important;
+    }
+    .inputFields {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+    .user-input-wrp {
+        position: relative;
+        width: 75%;
+    }
+    .user-input-wrp .input{
+        width: 100%;
+        outline: none;
+        border:none;
+        border-bottom: 1px solid #3A78DE;
+    }
+    .user-input-wrp .input:invalid {
+        box-shadow: none !important;
+        border-bottom: 1px solid red;
+    }
+    .user-input-wrp .input:focus{
+        border-width: medium medium 2px;
+    }
+    .user-input-wrp .floating-label {
+        position: absolute;
+        pointer-events: none;
+        top: 18px;
+        left: 5px;
+        transition: 0.15s ease all;
+        color: #777;
+    }
+    .user-input-wrp input:focus ~ .floating-label,
+    .user-input-wrp input:not(:focus):valid ~ .floating-label{
+        top: 5px;
+        left: 0px;
+        font-size: 13px;
+        opacity: 1;
+        color: #000;
+    }
+    .error {
+        font: 13px Colibri;
+        width: 75%;
+        color: red;
+        text-align: left;
+    }
+</style>
