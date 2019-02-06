@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'app.web',
+    'app.photo_load',
 ]
 
 MIDDLEWARE = [
@@ -120,3 +121,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     )
 }
+
+MEDIA_ROOT = 'media/'
+MEDIA_URL = '/media/'

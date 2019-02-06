@@ -15,6 +15,8 @@
 		* POST: nothing
 			* HTTP\_CODE: 200 - STATUS: OK, return nothing.
 * Photos:
+    * For all urls:
+        * HTTP\_CODE: 401 - error UNAUTHORIZED - user is not authorized.
     * /api/photos/ - return photos
         * GET: offset, limit and size.
             * HTTP\_CODE: 200 - STATUS: OK, return amount of photos in `count` and list of photos in needed size, where is heights, width and urls.
