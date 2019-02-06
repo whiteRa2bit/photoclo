@@ -40,13 +40,13 @@ def get_upload_path_size_s(instance, filename):
 
 
 class Storage(models.Model):
-    original = models.ImageField(upload_to=get_upload_path)
-    o_size = models.ImageField(upload_to=get_upload_path_size_o)
-    z_size = models.ImageField(upload_to=get_upload_path_size_z)
-    y_size = models.ImageField(upload_to=get_upload_path_size_y)
-    x_size = models.ImageField(upload_to=get_upload_path_size_x)
-    m_size = models.ImageField(upload_to=get_upload_path_size_m)
-    s_size = models.ImageField(upload_to=get_upload_path_size_s)
+    original = models.FileField(upload_to=get_upload_path)
+    o_size = models.FileField(upload_to=get_upload_path_size_o)
+    z_size = models.FileField(upload_to=get_upload_path_size_z)
+    y_size = models.FileField(upload_to=get_upload_path_size_y)
+    x_size = models.FileField(upload_to=get_upload_path_size_x)
+    m_size = models.FileField(upload_to=get_upload_path_size_m)
+    s_size = models.FileField(upload_to=get_upload_path_size_s)
 
     def __init__(self, *args, **kwargs):
         super(Storage, self).__init__(*args, **kwargs)
@@ -68,6 +68,7 @@ class Storage(models.Model):
 
     def compress(self, size):
         image_temp = Image.open(self.original)
+        image_temp = image_temp.convert("RGB")
         file_name = ''.join(self.original.name.split('.')[:-1])
         output_io_stream = BytesIO()
         if size == 'o':
@@ -93,7 +94,7 @@ class Photo(models.Model):
     height = models.IntegerField()
 
     def save(self, *args, **kwargs):
-        image = Image.open(self.storage.original)
+        image = Image.open(self.storage.o_size)
 
         if image._getexif() is not None and \
                 image._getexif().get(36867, None) is not None:

@@ -18,7 +18,6 @@ class StorageSerializer(serializers.ModelSerializer):
         fields = ('original',)
 
     def create(self, validated_data):
-        print(validated_data)
         storage, created = \
             Storage.objects.update_or_create(original=validated_data[0])
         return storage
@@ -34,6 +33,7 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = ('owner', 'storage', 'width', 'height')
 
     def create(self, validated_data):
+        print(validated_data)
         storage_data = validated_data.pop('storage')
         storage = StorageSerializer.create(StorageSerializer(),
                                            validated_data=storage_data)

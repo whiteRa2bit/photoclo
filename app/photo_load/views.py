@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
-    HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
 )
 
@@ -56,16 +55,20 @@ class PhotoView(viewsets.GenericViewSet):
 
     def create(self, request, pk=None):
         data = request.data
-        data['owner'] = request.user.id
-        data['user'] = request.user
+        status_list = []
+        for item in request.data.getlist('items[]'):
+            data['storage'] = item
+            data['owner'] = request.user.id
+            data['user'] = request.user
 
-        photo_serializer = PhotoSerializer(data=data)
+            photo_serializer = PhotoSerializer(data=data)
 
-        if photo_serializer.is_valid():
-            photo_serializer.create(validated_data=data)
-            return Response({}, status=HTTP_201_CREATED)
-        else:
-            return Response({}, status=HTTP_400_BAD_REQUEST)
+            if photo_serializer.is_valid():
+                photo_serializer.create(validated_data=data)
+                status_list.append('Success')
+            else:
+                status_list.append('Nope')
+        return Response({'status': status_list}, HTTP_201_CREATED)
 
     @action(detail=True, methods=['GET'])
     def download(self, request, pk=None):
