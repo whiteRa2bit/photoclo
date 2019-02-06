@@ -6,22 +6,22 @@
             <span v-if="incorrect" class="error">*Такой пользователь уже существует.</span>
             <div class="user-input-wrp">
                 <br/>
-                <input type="text" class="input" id="loginField" name="username" v.model="input.username" v-on:change="updateUsername" autofocus required align="center"/>
+                <input type="text" class="input" id="loginField" name="username" v.model="input.username" v-on:change="updateUsername" autofocus required align="center" tabindex="1" />
                 <span class="floating-label">Логин</span>
             </div>
             <div class="user-input-wrp">
                 <br/>
-                <input type="password" class="input" id="passwordField" name="password" v.model="input.password" v-on:change="updatePassword" required/>
+                <input type="password" class="input" id="passwordField" name="password" v.model="input.password" v-on:change="updatePassword" required tabindex="2" />
                 <span class="floating-label">Пароль</span>
             </div>
             <div class="user-input-wrp">
                 <br/>
-                <input type="text" class="input" id="emailField" name="email" v.model="input.email" v-on:change="updateEmail" autofocus required/>
+                <input type="text" class="input" id="emailField" name="email" v.model="input.email" v-on:change="updateEmail" required tabindex="3" />
                 <span class="floating-label">Электронная почта</span>
             </div>
-            <button class="button" id="registerButton" form="register" type="button" v-on:click="register()"><span>Регистрация</span></button>
+            <button class="button" id="registerButton" form="register" type="button" v-on:click="register()" tabindex="4"><span>Регистрация</span></button>
         </div>
-        <button class="button" id="loginButton" form="register" type="button" v-on:click="toLoginPage()">Уже есть аккаунт? Войти.</button>
+        <button class="button" id="loginButton" form="register" type="button" v-on:click="toLoginPage()" tabindex="5">Уже есть аккаунт? Войти.</button>
     </form>
 </template>
 
@@ -49,9 +49,13 @@
                         localStorage.token = response.data.token;
                         this_.$emit("authenticated", true);
                         this_.$router.replace({ name: "secure" });
-                    }).catch(function () {
+                    }).catch(function (error) {
+                        console.log(error);
                         this_.incorrect = true;
                     })
+                    /*localStorage.token = 228;
+                    this.$emit("authenticated", true);
+                    this.$router.replace({ name: "secure" });*/
                 }
             },
             toLoginPage() {
@@ -163,10 +167,12 @@
         transition: 0.5s;
     }
 
+    #registerButton:focus span,
     #registerButton:hover span {
         padding-right: 25px;
     }
 
+    #registerButton:focus span:after,
     #registerButton:hover span:after {
         opacity: 1;
         right: 0;
@@ -177,6 +183,10 @@
         text-align: left;
         font-size: 15px;
         color: #3A78DE;
+    }
+
+    #loginButton:focus {
+        outline: 1px;
     }
 
     input:focus {

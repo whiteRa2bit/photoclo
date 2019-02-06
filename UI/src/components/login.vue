@@ -6,17 +6,17 @@
             <span class="error" v-if="incorrect">*Логин или пароль введены не верно.</span>
             <div class="user-input-wrp">
                 <br/>
-                <input type="text" class="input" id="loginField" name="username" v.model="input.username" v-on:change="updateUsername" autofocus required/>
+                <input type="text" class="input" id="loginField" name="username" v.model="input.username" v-on:change="updateUsername" autofocus required tabindex="1" />
                 <span class="floating-label">Логин</span>
             </div>
             <div class="user-input-wrp">
                 <br/>
-                <input type="password" class="input" id="passwordField" name="password" v.model="input.password" v-on:change="updatePassword" required/>
+                <input type="password" class="input" id="passwordField" name="password" v.model="input.password" v-on:change="updatePassword" required tabindex="2" />
                 <span class="floating-label">Пароль</span>
             </div>
-            <button class="button" id="loginButton" form="login" type="button" v-on:click="login()"><span>Вход</span></button>
+            <button class="button" id="loginButton" form="login" type="button" v-on:click="login()" tabindex="3"><span>Вход</span></button>
         </div>
-        <button class="button" id="registerButton" form="login" type="button" v-on:click="toRegisterPage()">Еще нет аккаунта? Зарегистрируйтесь!</button>
+        <button class="button" id="registerButton" form="login" type="button" v-on:click="toRegisterPage()" tabindex="4">Еще нет аккаунта? Зарегистрируйтесь!</button>
     </form>
 </template>
 
@@ -45,9 +45,12 @@
                             localStorage.token = response.data.token;
                             this_.$emit("authenticated", true);
                             this_.$router.replace({ name: "secure" });
-                        }).catch(function () {
+                        }).catch(function (error) {
+                            console.log(error);
                             this_.incorrect = true;
                         });
+                    /*this_.$emit("authenticated", true);
+                    this_.$router.replace({ name: "secure" });*/
                 }
             },
             toRegisterPage() {
@@ -147,10 +150,12 @@
         transition: 0.5s;
     }
 
+    #loginButton:focus span,
     #loginButton:hover span {
         padding-right: 25px;
     }
 
+    #loginButton:focus span:after,
     #loginButton:hover span:after {
         opacity: 1;
         right: 0;
