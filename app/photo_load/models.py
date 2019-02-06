@@ -91,6 +91,7 @@ class Photo(models.Model):
     time_created = models.DateTimeField()
     width = models.IntegerField()
     height = models.IntegerField()
+    checked = models.NullBooleanField()
 
     def save(self, *args, **kwargs):
         image = Image.open(self.storage.original)
