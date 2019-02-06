@@ -13,7 +13,9 @@ with open(os.path.join(BASE_DIR, 'photoclo/secret_key')) as file:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.path.exists(os.path.join(BASE_DIR, 'photoclo/debug'))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'photoclo.ru',
+]
 
 
 # Application definition
