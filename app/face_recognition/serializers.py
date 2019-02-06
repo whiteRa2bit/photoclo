@@ -14,4 +14,4 @@ class FaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Face
-        fields = ('avatar', 'photo', 'embedding')
+        fields = ('avatar', 'photo', 'embedding', 'bounding_box',)

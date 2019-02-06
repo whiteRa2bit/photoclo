@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'app.web',
     'app.photo_load',
+    'app.face_recognition',
 ]
 
 MIDDLEWARE = [

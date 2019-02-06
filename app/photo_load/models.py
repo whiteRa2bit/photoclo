@@ -68,6 +68,7 @@ class Storage(models.Model):
 
     def compress(self, size):
         image_temp = Image.open(self.original)
+        image_temp = image_temp.convert("RGB")
         file_name = ''.join(self.original.name.split('.')[:-1])
         output_io_stream = BytesIO()
         if size == 'o':
