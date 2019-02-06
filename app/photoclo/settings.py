@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'app.web',
+    'app.photo_load',
 ]
 
 MIDDLEWARE = [
@@ -70,7 +71,7 @@ DATABASES = {
         'ENGINE': db_config[0],
         'NAME': db_config[1],
         'USER': db_config[2],
-        'PASSWORD': db_config[3],
+        'PASSWORD': db_config[3] if db_config != 'NULL' else None,
         'HOST': db_config[4],
         'PORT': db_config[5],
     }
@@ -120,3 +121,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     )
 }
+
+MEDIA_ROOT = 'media/'
+MEDIA_URL = '/media/'
