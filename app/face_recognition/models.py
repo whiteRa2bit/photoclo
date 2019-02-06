@@ -12,4 +12,5 @@ class Face(models.Model):
     avatar = models.ForeignKey(Avatar, on_delete=models.CASCADE, null=True)
     photo = models.ForeignKey(Photo, on_delete=models.CASCADE)
     embedding = JSONField()
+    bounding_box = JSONField()
 
