@@ -14,7 +14,7 @@ input_image_size = 160
 
 sess = tf.Session()
 
-facenet.load_model("20170512-110547/20170512-110547.pb")
+facenet.load_model("model/model.pb")
 
 images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
 embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")

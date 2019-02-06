@@ -3,8 +3,8 @@ from detect_faces import *
 import urllib.request
 import cv2
 
-# Comment this if you want to use local file
-url = "https://pp.userapi.com/5TlmrlkrVXHM35ldcpenMCEMq3EEk5-Dkrp_bw/yqbYOJR0XIc.jpg"
+# Comment this if you want to use file
+url = "https://pp.userapi.com/c849124/v849124518/1254d8/wD1_ZRhuszM.jpg"
 resp = urllib.request.urlopen(url) 
 img = np.asarray(bytearray(resp.read()), dtype="uint8") 
 img = cv2.imdecode(img, cv2.IMREAD_COLOR)
