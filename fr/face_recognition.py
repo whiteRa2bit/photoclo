@@ -6,7 +6,7 @@ import urllib.request
 
 app = Flask(__name__)
 
-@app.route('/api', methods = ['GET'])
+@app.route('/recognize', methods = ['GET'])
 def return_faces():
 	url = request.args['url']  # user provides url in query string
 	resp = urllib.request.urlopen(url) 
