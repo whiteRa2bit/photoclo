@@ -40,13 +40,13 @@ def get_upload_path_size_s(instance, filename):
 
 
 class Storage(models.Model):
-    original = models.FileField(upload_to=get_upload_path)
-    o_size = models.FileField(upload_to=get_upload_path_size_o)
-    z_size = models.FileField(upload_to=get_upload_path_size_z)
-    y_size = models.FileField(upload_to=get_upload_path_size_y)
-    x_size = models.FileField(upload_to=get_upload_path_size_x)
-    m_size = models.FileField(upload_to=get_upload_path_size_m)
-    s_size = models.FileField(upload_to=get_upload_path_size_s)
+    original = models.ImageField(upload_to=get_upload_path)
+    o_size = models.ImageField(upload_to=get_upload_path_size_o)
+    z_size = models.ImageField(upload_to=get_upload_path_size_z)
+    y_size = models.ImageField(upload_to=get_upload_path_size_y)
+    x_size = models.ImageField(upload_to=get_upload_path_size_x)
+    m_size = models.ImageField(upload_to=get_upload_path_size_m)
+    s_size = models.ImageField(upload_to=get_upload_path_size_s)
 
     def __init__(self, *args, **kwargs):
         super(Storage, self).__init__(*args, **kwargs)
