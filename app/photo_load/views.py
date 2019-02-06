@@ -17,19 +17,19 @@ class PhotoView(viewsets.GenericViewSet):
     permission_classes = (IsAuthenticated,)
 
     def list(self, request, pk=None):
-        print(request.data)
         offset = int(request.query_params['offset'])
         limit = int(request.query_params['limit'])
-        user = request.user
-        photos = Photo.objects.filter(owner=user)\
-                     .order_by('-time_created')[offset:offset + limit]
         size = request.query_params['size']
+        user = request.user
+
+        photos = Photo.objects.filter(owner=user)\
+                      .order_by('-time_created')[offset:offset + limit]
+
         size_field = Storage._meta.get_field('{0}_size'.format(size))
-        client_photo = \
-            [{'url': size_field.value_from_object(
-                Storage.objects.filter(photo=photo)[0]).url,
-              'height': photo.height, 'width': photo.width} for photo in
-             photos]
+        client_photo = [{'url': size_field.value_from_object(
+                                Storage.objects.filter(photo=photo)[0]).url,
+                         'height': photo.height, 'width': photo.width}
+                        for photo in photos]
 
         count = len(client_photo)
         return Response({'count': count, 'photos': client_photo},
@@ -38,16 +38,19 @@ class PhotoView(viewsets.GenericViewSet):
     def retrieve(self, request, pk):
         photos = Photo.objects.filter(owner=request.user)
         photo = Storage.objects.filter(photo__in=photos).filter(photo=pk)
+
         if len(photo) == 0:
             return Response({}, status=HTTP_404_NOT_FOUND)
+
         return Response({'url': photo[0].o_size.url}, status=HTTP_200_OK)
 
     def destroy(self, request, pk):
         photos = Photo.objects.filter(owner=request.user)
-        photo = Storage.objects.filter(photo__in=photos)\
-            .filter(photo=pk)
+        photo = Storage.objects.filter(photo__in=photos).filter(photo=pk)
+
         if len(photo) == 0:
             return Response({}, status=HTTP_404_NOT_FOUND)
+
         photo[0].delete()
         return Response(status=HTTP_200_OK)
 
@@ -68,6 +71,7 @@ class PhotoView(viewsets.GenericViewSet):
     def download(self, request, pk=None):
         photos = Photo.objects.filter(owner=request.user)
         photo = Storage.objects.filter(photo__in=photos).filter(photo=pk)
+
         if len(photo) == 0:
             return Response({}, status=HTTP_404_NOT_FOUND)
         return Response({'url': photo[0].original.url}, status=HTTP_200_OK)

@@ -13,11 +13,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class StorageSerializer(serializers.ModelSerializer):
-    o_size = serializers.ImageField(required=False)
-
     class Meta:
         model = Storage
-        fields = ('original', 'o_size')
+        fields = ('original',)
 
     def create(self, validated_data):
         print(validated_data)

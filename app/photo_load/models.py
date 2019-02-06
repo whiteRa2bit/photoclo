@@ -57,17 +57,18 @@ class Storage(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            self.o_size = self.compress(self.original, 'o')
-            self.z_size = self.compress(self.original, 'z')
-            self.y_size = self.compress(self.original, 'y')
-            self.x_size = self.compress(self.original, 'x')
-            self.m_size = self.compress(self.original, 'm')
-            self.s_size = self.compress(self.original, 's')
+            self.o_size = self.compress('o')
+            self.z_size = self.compress('z')
+            self.y_size = self.compress('y')
+            self.x_size = self.compress('x')
+            self.m_size = self.compress('m')
+            self.s_size = self.compress('s')
 
         super(Storage, self).save(*args, **kwargs)
 
-    def compress(self, file, size):
-        image_temp = Image.open(file)
+    def compress(self, size):
+        image_temp = Image.open(self.original)
+        file_name = ''.join(self.original.name.split('.')[:-1])
         output_io_stream = BytesIO()
         if size == 'o':
             shape = image_temp.size
@@ -77,11 +78,9 @@ class Storage(models.Model):
         image_temp.thumbnail(shape)
         image_temp.save(output_io_stream, format='JPEG', quality=90)
         output_io_stream.seek(0)
-        sized = \
-            InMemoryUploadedFile(output_io_stream, 'ImageField',
-                                 "{0}.jpeg".format(file.name.split('.')[0]),
-                                 'image/jpeg', sys.getsizeof(output_io_stream),
-                                 None)
+        sized = InMemoryUploadedFile(output_io_stream, 'ImageField',
+                                     "{0}.jpeg".format(file_name), 'image/jpeg',
+                                     sys.getsizeof(output_io_stream), None)
         return sized
 
 
@@ -94,13 +93,17 @@ class Photo(models.Model):
     height = models.IntegerField()
 
     def save(self, *args, **kwargs):
-        image_temp = Image.open(self.storage.original)
-        if image_temp._getexif() is not None and \
-                image_temp._getexif().get(36867, None) is not None:
-            self.time_created = datetime.strptime(
-                image_temp._getexif()[36867], '%Y:%m:%d %H:%M:%S')
+        image = Image.open(self.storage.original)
+
+        if image._getexif() is not None and \
+                image._getexif().get(36867, None) is not None:
+
+            self.time_created = \
+                datetime.strptime(image._getexif()[36867],
+                                  '%Y:%m:%d %H:%M:%S')
 
         else:
             self.time_created = datetime.now()
-        self.width, self.height = image_temp.size
+
+        self.width, self.height = image.size
         super(Photo, self).save(*args, **kwargs)
