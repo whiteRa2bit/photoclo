@@ -1,5 +1,5 @@
 # API
-* /recognize - get all faces and their embeddings on a given photo
+* /recognize - get all faces and their embeddings in a given photo
 	* GET: url
 		* returns JSON file with following fields:
           * "boxes" - detected faces coordinates, each box is a list of four integers [x1, y1, x2, y2] , where x1 < x2, y1 < y2
