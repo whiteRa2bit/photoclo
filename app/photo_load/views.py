@@ -27,7 +27,8 @@ class PhotoView(viewsets.GenericViewSet):
         size_field = Storage._meta.get_field('{0}_size'.format(size))
         client_photo = [{'url': size_field.value_from_object(
                                 Storage.objects.filter(photo=photo)[0]).url,
-                         'height': photo.height, 'width': photo.width}
+                         'height': photo.height, 'width': photo.width,
+                         'id': photo.storage.id}
                         for photo in photos]
 
         count = len(client_photo)

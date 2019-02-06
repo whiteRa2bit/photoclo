@@ -19,7 +19,7 @@
         * HTTP\_CODE: 401 - error UNAUTHORIZED - user is not authorized.
     * /api/photos/ - return photos
         * GET: offset, limit and size.
-            * HTTP\_CODE: 200 - STATUS: OK, return amount of photos in `count` and list of photos in needed size, where is heights, width and urls.
+            * HTTP\_CODE: 200 - STATUS: OK, return amount of photos in `count` and list of photos in needed size, where is heights, width, urls and id.
             * HTTP\_CODE: 411 - STATUS: error LENGTH\_REQUIRED, no limit was sent.
             * HTTP\_CODE: 416 - STATUS: error REQUESTED\_RANGE\_NOT\_SATISFIABLE, offset is grater than amount of photos in a server.
         * POST: photo
