@@ -10,7 +10,7 @@ app = Celery('tasks', broker='pyamqp://guest@localhost//')
 
 loop = asyncio.get_event_loop()
 with open('face_detection.config') as file:
-    fr_url = file.readline()
+    fd_url = file.readline()
     site_url = file.readline()
 
 
@@ -18,7 +18,7 @@ with open('face_detection.config') as file:
 def get_faces(photo_id):
     storage = Storage.objects.filter(photo=photo_id).first().z_size
     storage_url = '{0}{1}'.format(site_url, storage.url)
-    data = requests.get(fr_url, params={'url': storage_url}).json()
+    data = requests.get(fd_url, params={'url': storage_url}).json()
     faces = [{'bounding_box': data['boxes'][i],
               'embedding': data['embeddings'][i],
               'photo': photo_id} for i in range(data['faces_num'])]

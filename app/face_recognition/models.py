@@ -13,4 +13,5 @@ class Face(models.Model):
     photo = models.ForeignKey(Photo, on_delete=models.CASCADE)
     embedding = JSONField()
     bounding_box = JSONField()
+    user_checked = models.BooleanField(default=False)
 
