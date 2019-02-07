@@ -1,5 +1,3 @@
-import os
-
 import requests
 from celery import Celery
 from django.conf import settings
@@ -10,10 +8,8 @@ from .find_identity import get_identity
 
 app = Celery('tasks', broker='pyamqp://guest@localhost//')
 
-with open(os.path.join(settings.BASE_DIR, 'face_recognition',
-                       'face_detection.config')) as file:
-    fd_url = file.readline()
-    site_url = file.readline()
+fd_url = settings.FACE_DETECTION_URLS['face detection url']
+site_url = settings.FACE_DETECTION_URLS['compressed photo storage']
 
 
 @app.task

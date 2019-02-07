@@ -1,6 +1,5 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
@@ -15,8 +14,6 @@ from .serializers import PhotoSerializer
 
 
 class PhotoView(viewsets.GenericViewSet):
-    permission_classes = (IsAuthenticated,)
-
     def list(self, request, pk=None):
         offset = int(request.query_params['offset'])
         limit = int(request.query_params['limit'])
