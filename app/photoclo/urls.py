@@ -4,12 +4,15 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
+from app.face_recognition.views import FaceView, AvatarView
 from app.photo_load.views import PhotoView
 from app.web.views import index
 from .views import sign_in, sign_out, sign_up, test_api
 
 router = routers.SimpleRouter()
 router.register(r'api/photos', PhotoView, base_name='photos')
+router.register(r'api/faces', FaceView, base_name='faces')
+router.register(r'api/avatars', AvatarView, base_name='avatars')
 
 
 urlpatterns = [
