@@ -24,7 +24,7 @@ def get_identity(face_id):
             avatar_dist = norm
 
     if avatar_dist < threshold:
-        return avatar_id
+        return save_avatar(face_id, avatar_id)
     else:
         return create_new_avatar(face_id)
 
@@ -39,6 +39,11 @@ def create_new_avatar(face_id):
     return avatar.id
 
 
+def save_avatar(face_id, avatar_id):
+    face = Face.objects.filter(id=face_id).first()
+    face.avatar = Avatar.objects.filter(id=avatar_id).first()
+    face.save()
+    return avatar_id
 
 
 
