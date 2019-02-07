@@ -1,15 +1,13 @@
-from django.contrib.auth.models import User
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.db import models
-
-from wand.image import Image
-
+import subprocess
+import sys
 from datetime import datetime
 from io import BytesIO
 from uuid import uuid4
-import subprocess
-import sys
 
+from django.contrib.auth.models import User
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.db import models
+from wand.image import Image
 
 sizes = {'o': 'max', 'z': 1080, 'y': 807, 'x': 604, 'm': 130, 's': 100}
 
@@ -103,12 +101,19 @@ class Photo(models.Model):
     checked = models.NullBooleanField()
 
     def save(self, *args, **kwargs):
+        for size_type in sizes:
+            size = getattr(self.storage, '{0}_size'.format(size_type))
+            subprocess.run(['exiftool', '-TagsFromFile',
+                            self.storage.original.path, size.path],
+                           stdout=subprocess.PIPE)
+
         with Image(blob=self.storage.o_size.file) as image:
             self.width, self.height = image.size
 
         result = subprocess.run(['exiftool', '-dateTimeOriginal',
-                                 self.storage.original.path],
+                                self.storage.original.path],
                                 stdout=subprocess.PIPE)
+
         result = result.stdout.decode('utf-8')
         if len(result) == 0:
             self.time_created = datetime.now()
