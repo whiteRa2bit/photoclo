@@ -1,7 +1,6 @@
-from .models import Face
 import numpy as np
-import json
 
+from .models import Face, Avatar
 
 threshold = 0.8   # if we find a face, such that the distance between the found face and the given face
                 # is smaller than a threshold, than we suppose it is the same avatar
@@ -27,10 +26,17 @@ def get_identity(face_id):
     if avatar_dist < threshold:
         return avatar_id
     else:
-        pass  # It is necessary to call a function to create a new avatar here
+        return create_new_avatar(face_id)
 
 
-
+def create_new_avatar(face_id):
+    avatar = Avatar.objects.create()
+    avatar.name = 'New Avatar'
+    avatar.save()
+    face = Face.objects.filter(id=face_id).first()
+    face.avatar = avatar
+    face.save()
+    return avatar.id
 
 
 

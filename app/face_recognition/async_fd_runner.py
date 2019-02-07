@@ -18,6 +18,7 @@ with open('face_detection.config') as file:
 def get_faces(photo_id):
     storage = Storage.objects.filter(photo=photo_id).first().z_size
     storage_url = '{0}{1}'.format(site_url, storage.url)
+    print(storage_url)
     data = requests.get(fd_url, params={'url': storage_url}).json()
     faces = [{'bounding_box': data['boxes'][i],
               'embedding': data['embeddings'][i],
