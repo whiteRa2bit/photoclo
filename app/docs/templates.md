@@ -25,3 +25,12 @@ Example:
 
 ### debug
 Empty file, working like trigger for debug option.
+
+### face_detection.config
+Two lines, first for face detection server, second for root url of site.
+Protocol is necessary.
+
+Example:
+    
+    http://localhost:5000/recognize
+    http://localhost:8000

@@ -1,14 +1,15 @@
-import subprocess
-import sys
-from datetime import datetime
-from io import BytesIO
-from uuid import uuid4
-
-from PIL import Image as PImage
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
+
 from wand.image import Image
+
+from datetime import datetime
+from io import BytesIO
+from uuid import uuid4
+import subprocess
+import sys
+
 
 sizes = {'o': 'max', 'z': 1080, 'y': 807, 'x': 604, 'm': 130, 's': 100}
 
@@ -99,12 +100,10 @@ class Photo(models.Model):
     time_created = models.DateTimeField()
     width = models.IntegerField()
     height = models.IntegerField()
+    checked = models.NullBooleanField()
 
     def save(self, *args, **kwargs):
-        temp_image = PImage.open(self.storage.o_size)
-        blob = BytesIO()
-        temp_image.save(blob, 'JPEG')
-        with Image(blob=blob.getvalue()) as image:
+        with Image(blob=self.storage.o_size.file) as image:
             self.width, self.height = image.size
 
         result = subprocess.run(['exiftool', '-dateTimeOriginal',
