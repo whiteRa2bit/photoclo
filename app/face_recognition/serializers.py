@@ -4,6 +4,7 @@ from .models import Avatar, Face
 
 
 class AvatarSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
 
     class Meta:
         model = Avatar
@@ -11,6 +12,7 @@ class AvatarSerializer(serializers.ModelSerializer):
 
 
 class FaceSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
 
     class Meta:
         model = Face

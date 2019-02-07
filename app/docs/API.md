@@ -17,7 +17,7 @@
 * Photos:
     * For all urls:
         * HTTP\_CODE: 401 - error UNAUTHORIZED - user is not authorized.
-    * /api/photos/ - return photos
+    * /api/photos/ - return or upload photos
         * GET: offset, limit and size.
             * HTTP\_CODE: 200 - STATUS: OK, return amount of photos in `count` and list of photos in needed size, where is heights, width and urls.
             * HTTP\_CODE: 411 - STATUS: error LENGTH\_REQUIRED, no limit was sent.
@@ -41,3 +41,24 @@
             * HTTP\_CODE: 200 - STATUS: OK, return url to download original.
             * HTTP\_CODE: 404 - STATUS: error NOT\_FOUND, there is no photo with this id.
             * HTTP\_CODE: 507 - STATUS: error INSUFFICIENT\_STORAGE, cannot reach original. 
+* Faces and avatars:
+    * For all urls:
+        * HTTP\_CODE: 401 - error UNAUTHORIZED - user in not authorized.
+    * /api/face/\<id\>/ - return faces on photo or edit face
+        * GET: nothin
+            * HTTP\_CODE: 200 - STATUS: OK, return faces on photo in `faces`.
+            * HTTP\_CODE: 204 - STATUS: NO\_CONTENT, faces don't exist.
+        * PUT: face id and new avatar id:
+            * HTTP\_CODE: 200 - STATUS: OK, avatar was changed
+            * HTTP\_CODE: 404 - STATUS: error NOT\_FOUND, face with this id wasn't found.
+    * /api/avatar/ - return avatars
+        * GET: nothing
+            * HTTP\_CODE: 200 - STATUS: OK, return avatars in `avatars`.
+            * HTTP\_CODE: 204 - STATUS: NO\_CONTENT, avatars don't exist.
+    * /api/avatar/\<id\>/ - create or update avatars.
+        * POST: face_id and avatar name
+            * HTTP\_CODE: 201 - STATUS: CREATED, avatar was created.
+            * HTTP\_CODE: 500 - STATUS: error INTERNAL\_SERVER\_ERROR, error in creating avatar.
+        * PUT: new name
+            * HTTP\_CODE: 200 - STATUS: OK, avatar name was changed
+            * HTTP\_CODE: 404 -  STATUS: NOT\_FOUND, avatar with this id wasn't found.
