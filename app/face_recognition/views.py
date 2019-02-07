@@ -56,8 +56,8 @@ class AvatarView(viewsets.ViewSet):
                                                    'face': face.id})
 
         if avatar_serializer.is_valid():
-            avatar_serializer.save()
-            return Response({}, status=HTTP_201_CREATED)
+            new_avatar = avatar_serializer.save()
+            return Response(new_avatar, status=HTTP_201_CREATED)
         else:
             return Response({}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 

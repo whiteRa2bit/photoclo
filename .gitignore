@@ -103,12 +103,10 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-app/photoclo/database.config
-app/photoclo/debug
-app/photoclo/secret_key
-app/photoclo/utils/
-
+configs/
 web/static/web
 
 app/face_detection.config
 app/face_recognition/face_detection.config
+
+web/templates
