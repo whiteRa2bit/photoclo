@@ -63,7 +63,7 @@ with open(os.path.join(BASE_DIR, 'configs', 'database_config.yaml')) as file:
     db_config = load(file)
 
 DATABASES = {
-    'default': db_config,
+    'default': db_config['database'],
 }
 
 

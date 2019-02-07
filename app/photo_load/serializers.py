@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
 class StorageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Storage
-        fields = ('original',)
+        fields = ('id', 'original',)
 
     def create(self, validated_data):
         storage, created = \
