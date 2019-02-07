@@ -1,34 +1,41 @@
 <template>
+
     <div id="app">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <div v-if="authenticated" class="topnav" id="myTopnav">
-            <a href="photoclo.ru:8000">PHOTOCLO</a>
-            <div class="searchField">
-                <br>
-                <input type="text" class="input" id="searchField" name="search" v.model="input.search" v-on:change="updateSearch" required tabindex="1" />
-                <span class="floating-label">Поиск</span>
-            </div>
-            <div class="leftButtons">
-                <button id="uploadButton" onclick="document.getElementById('id01').style.display='block'" style="width:auto;">upload</button>
+        
+        <b-navbar toggleable="md" type="dark" v-if="authenticated" variant="info" sticky="true">
 
-                <div id="id01" class="modal">
-                    <div class="modal-content">
-                        <div class="container">
-                            <multiple-file-uploader id="fileUploader" postURL="/api/photos/" successMessagePath="" errorMessagePath=""></multiple-file-uploader>
-                        </div>
+          <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-                        <div class="container" style="background-color:#f1f1f1">
-                          <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelButton">Close</button>
-                        </div>
-                    </div>
+          <b-navbar-brand href="photoclo.ru:8000">PHOTOCLO</b-navbar-brand>
+
+          <b-collapse is-nav id="nav_collapse" right>
+
+            <b-navbar-nav class="ml-auto">
+
+              <div class="container h-100">
+              <div class="d-flex justify-content-center h-100">
+                <div class="searchbar">
+                  <input class="search_input" type="text" name="" placeholder="Search...">
+                  <a href="#" class="search_icon"><i class="fas fa-search"></i></a>
                 </div>
-
-                <button id="logoutButton" type="button" v-on:click="logout()">logout</button>
-                <a href="javascript:void(0);" class="icon" v-on:click="myFunction()">
-                    <i class="fa fa-bars"></i>
-                </a>
+              </div>
             </div>
-        </div>
+
+              <b-button v-b-modal.uploadModal v-on:click='updateToken()' right>Загрузить</b-button>
+
+                <b-modal id="uploadModal" title="Загрузка фотографий">
+                    <multiple-file-uploader id="fileUploader" postURL="/api/photos/" successMessagePath="" errorMessagePath=""></multiple-file-uploader>
+                </b-modal>
+
+              <b-dropdown right text="Пользователь" class="m-md-2" style="margin: 0px !important; margin-left: 5px; margin-right: 5px">
+                <b-dropdown-item href="#">Профиль</b-dropdown-item>
+                <b-dropdown-item v-on:click="logout()">Выйти</b-dropdown-item>
+              </b-dropdown>
+            </b-navbar-nav>
+
+          </b-collapse>
+        </b-navbar>
         <router-view @authenticated="setAuthenticated" />
     </div>
 </template>
@@ -47,8 +54,7 @@
 
     window.onload = function() {
         var this_ = this;
-        var element = document.getElementsByClassName('uploadBox')[0];
-        element.__vue__.$props.postHeader = {Authorization: "Token " + localStorage.token};
+        document.getElementsByClassName('uploadBox')[0].__vue__.$props.postHeader = {Authorization: "Token " + localStorage.token};
     }
 
     export default {
@@ -76,6 +82,9 @@
             }
         },
         methods: {
+            updateToken () {
+                document.getElementsByClassName('uploadBox')[0].__vue__.$props.postHeader = {Authorization: "Token " + localStorage.token};
+            },
             setAuthenticated(status) {
                 this.authenticated = status;
             },
@@ -86,17 +95,7 @@
                     this_.$router.replace({ name: "login" });
                     delete localStorage.token;
                 });
-                /*this_.authenticated = false;  
-                delete localStorage.token;*/
-            },
-            myFunction() {
-                var x = document.getElementById("myTopnav");
-                if (x.className === "topnav") {
-                    x.className += " responsive";
-                } else {
-                    x.className = "topnav";
-                }
-            },
+            }
         },
     }
 </script>
@@ -113,195 +112,56 @@
     #app {
     }
 
-    .topnav {
-        width: 100%;
-        background-color: #FFF;
-        overflow: hidden;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-content: center;
-    }
-
-    .topnav a {
-        float: left;
-        display: block;
-        color: #3A78DE;
-        text-align: center;
-        padding: 20px 16px;
-        text-decoration: none;
-        font-size: 20px;
-    }
-
-    .topnav a:hover {
-        background-color: #ddd;
-        color: black;
-    }
-
     .active {
         background-color: #4CAF50;
         color: white;
-    }
-
-    .topnav .icon {
-        display: none;
-    }
-
-    @media screen and (max-width: 600px) {
-        .topnav a:not(:first-child) {display: none;}
-        .topnav a.icon {
-            float: right;
-            display: block;
-        }
-    }
-
-    @media screen and (max-width: 600px) {
-        .topnav.responsive {position: relative;}
-        .topnav.responsive a.icon {
-            position: absolute;
-            right: 0;
-            top: 0;
-        }
-        .topnav.responsive a {
-            float: none;
-            display: block;
-            text-align: left;
-        }
-    }
-
-    .searchField {
-        align-self: center;
-    }
-
-    #logoutButton,
-    .cancelButton,
-    #uploadButton {
-        background-color: #4CAF50;
-        color: white;
-        padding: 14px 20px;
-        margin: 8px 0;
-        border: none;
-        cursor: pointer;
-    }
-
-    .cancelButton,
-    #uploadButton {
-        width: 100%;
     }
 
     button:hover {
       opacity: 0.8;
     }
 
-    .cancelButton {
-      width: auto;
-      padding: 10px 18px;
-      background-color: #f44336;
-    }
-
-    .container {
-      padding: 16px;
-    }
-
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgb(0,0,0);
-        background-color: rgba(0,0,0,0.4);
-        padding-top: 60px;
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        margin: 5% auto 15% auto;
-        border: 1px solid #888;
-        width: 80%;
-    }
-
-    .animate {
-        -webkit-animation: animatezoom 0.6s;
-        animation: animatezoom 0.6s
-    }
-
-    @-webkit-keyframes animatezoom {
-        from {-webkit-transform: scale(0)} 
-        to {-webkit-transform: scale(1)}
-    }
-      
-    @keyframes animatezoom {
-        from {transform: scale(0)} 
-        to {transform: scale(1)}
-    }
-
-    @media screen and (max-width: 300px) {
-        span.psw {
-            display: block;
-            float: none;
-        }
-        .cancelbtn {
-            width: 100%;
-        }
-    }
-
     .dropAreaDragging{
         background-color: #ccc;
     }
 
-    .input {
-        font: 20px Calibri;
-        border-left: 0px;
-        border-right: 0px;
-        border-top: 0px;
-        border-bottom: 1px solid #3A78DE;
+    .searchbar{
+        margin: auto;
+        height: 60px;
+        background-color: #353b48;
+        border-radius: 30px;
+        padding: 10px;
     }
 
-    input:focus {
-        outline: none !important;
+    .search_input{
+        color: white;
+        border: 0;
+        outline: 0;
+        background: none;
+        width: 0;
+        line-height: 40px;
+        transition: width 0.4s linear;
     }
 
-    .searchField {
-        position: relative;
-        width: 50%;
-    }
-    .searchField .input{
-        width: 100%;
-        outline: none;
-        border:none;
-        border-bottom: 1px solid #3A78DE;
-    }
-    .searchField .input:invalid {
-        box-shadow: none !important;
-        border-bottom: 1px solid red;
-    }
-    .searchField .input:focus{
-        border-width: medium medium 2px;
-    }
-    .searchField .floating-label {
-        position: absolute;
-        pointer-events: none;
-        top: 20px;
-        left: 5px;
-        transition: 0.15s ease all;
-        color: #777;
-    }
-    .searchField input:focus ~ .floating-label,
-    .searchField input:not(:focus):valid ~ .floating-label{
-        top: 5px;
-        left: 2px;
-        font-size: 13px;
-        opacity: 1;
-        color: #000;
+    .searchbar:hover > .search_input{
+        padding: 0 10px;
+        width: 200px;
+        transition: width 0.4s linear;
     }
 
-    .leftButtons {
+    .searchbar:hover > .search_icon{
+        background: white;
+        color: #e74c3c;
+    }
+
+    .search_icon{
+        height: 40px;
+        width: 40px;
+        float: right;
         display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        color:white;
     }
 </style>

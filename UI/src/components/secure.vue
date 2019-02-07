@@ -32,7 +32,7 @@
         },
         mounted() {
             var this_ = this;
-            axios.get('/api/photos/', { headers: {Authorization: "Token " + localStorage.token}, params: {offset: 1, limit: 2000, size: "o"}}).then(function (response) {
+            axios.get('/api/photos/', { headers: {Authorization: "Token " + localStorage.token}, params: {offset: 0, limit: 2000, size: "o"}}).then(function (response) {
                 console.log(response);
                 for (var i = 0; i < response.data.photos.length; ++i) {
                     console.log(response.data.photos[i]);
@@ -52,8 +52,7 @@
 
 <style scoped>
     #secure {
-        background-color: #FFFFFF;
-        border: 1px solid #CCCCCC;
+        background-color: rgba(0, 0, 0, 0);
         padding: 20px;
         margin-top: 10px;
         display: flex;
