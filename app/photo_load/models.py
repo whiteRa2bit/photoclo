@@ -1,12 +1,14 @@
+import subprocess
 import sys
 from datetime import datetime
 from io import BytesIO
 from uuid import uuid4
 
-from PIL import Image
+from PIL import Image as PImage
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
+from wand.image import Image
 
 sizes = {'o': 'max', 'z': 1080, 'y': 807, 'x': 604, 'm': 130, 's': 100}
 
@@ -40,7 +42,7 @@ def get_upload_path_size_s(instance, filename):
 
 
 class Storage(models.Model):
-    original = models.ImageField(upload_to=get_upload_path)
+    original = models.FileField(upload_to=get_upload_path)
     o_size = models.ImageField(upload_to=get_upload_path_size_o)
     z_size = models.ImageField(upload_to=get_upload_path_size_z)
     y_size = models.ImageField(upload_to=get_upload_path_size_y)
@@ -67,22 +69,27 @@ class Storage(models.Model):
         super(Storage, self).save(*args, **kwargs)
 
     def compress(self, size):
-        image_temp = Image.open(self.original)
-        image_temp = image_temp.convert("RGB")
-        file_name = ''.join(self.original.name.split('.')[:-1])
-        output_io_stream = BytesIO()
-        if size == 'o':
-            shape = image_temp.size
-        else:
-            shape = (min(image_temp.width, sizes[size]),
-                     min(image_temp.height, sizes[size]))
-        image_temp.thumbnail(shape)
-        image_temp.save(output_io_stream, format='JPEG', quality=90)
-        output_io_stream.seek(0)
-        sized = InMemoryUploadedFile(output_io_stream, 'ImageField',
-                                     "{0}.jpeg".format(file_name), 'image/jpeg',
-                                     sys.getsizeof(output_io_stream), None)
-        return sized
+        with Image(blob=self.original.file) as image:
+            image.format = 'jpeg'
+            image.compression_quality = 90
+            file_name = ''.join(self.original.name.split('.')[:-1])
+            io_stream = BytesIO()
+            if size == 'o':
+                shape = image.size
+            else:
+                min_side = min(image.size)
+                if min_side < sizes[size]:
+                    min_side = sizes[size]
+                proc = sizes[size] / min_side
+                shape = (int(image.width * proc), int(image.height * proc))
+            image.resize(*shape)
+            image.save(io_stream)
+            io_stream.seek(0)
+            sized = InMemoryUploadedFile(io_stream, 'ImageField',
+                                         "{0}.jpeg".format(file_name),
+                                         'image/jpeg', sys.getsizeof(io_stream),
+                                         None)
+            return sized
 
 
 class Photo(models.Model):
@@ -94,17 +101,21 @@ class Photo(models.Model):
     height = models.IntegerField()
 
     def save(self, *args, **kwargs):
-        image = Image.open(self.storage.o_size)
+        temp_image = PImage.open(self.storage.o_size)
+        blob = BytesIO()
+        temp_image.save(blob, 'JPEG')
+        with Image(blob=blob.getvalue()) as image:
+            self.width, self.height = image.size
 
-        if image._getexif() is not None and \
-                image._getexif().get(36867, None) is not None:
-
-            self.time_created = \
-                datetime.strptime(image._getexif()[36867],
-                                  '%Y:%m:%d %H:%M:%S')
-
-        else:
+        result = subprocess.run(['exiftool', '-dateTimeOriginal',
+                                 self.storage.original.path],
+                                stdout=subprocess.PIPE)
+        result = result.stdout.decode('utf-8')
+        if len(result) == 0:
             self.time_created = datetime.now()
+        else:
+            dt = (':'.join(result.split(':')[1:])).split('+')[0]
+            dt = dt.strip()
+            self.time_created = datetime.strptime(dt, '%Y:%m:%d %H:%M:%S')
 
-        self.width, self.height = image.size
         super(Photo, self).save(*args, **kwargs)

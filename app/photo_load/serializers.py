@@ -33,7 +33,6 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = ('owner', 'storage', 'width', 'height')
 
     def create(self, validated_data):
-        print(validated_data)
         storage_data = validated_data.pop('storage')
         storage = StorageSerializer.create(StorageSerializer(),
                                            validated_data=storage_data)
