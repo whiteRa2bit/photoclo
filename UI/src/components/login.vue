@@ -1,4 +1,4 @@
-<template>
+            <template>
     <form id="login" align="center">
         <h1>Вход</h1>
         <div class="inputFields">
