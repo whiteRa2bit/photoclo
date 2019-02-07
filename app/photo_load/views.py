@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
 )
 
@@ -21,8 +22,12 @@ class PhotoView(viewsets.GenericViewSet):
         size = request.query_params['size']
         user = request.user
 
-        photos = Photo.objects.filter(owner=user)\
-                      .order_by('-time_created')[offset:offset + limit]
+        photos = Photo.objects.filter(owner=user).order_by('-time_created')
+        if len(photos) < offset:
+            return Response({'error': "Offset is too large"},
+                            status=HTTP_400_BAD_REQUEST)
+
+        photos = photos[offset:offset + limit]
 
         size_field = Storage._meta.get_field('{0}_size'.format(size))
         client_photo = [{'url': size_field.value_from_object(
@@ -68,7 +73,7 @@ class PhotoView(viewsets.GenericViewSet):
                 photo_serializer.create(validated_data=data)
                 status_list.append('Success')
             else:
-                status_list.append('Nope')
+                status_list.append('Fail')
         return Response({'status': status_list}, HTTP_201_CREATED)
 
     @action(detail=True, methods=['GET'])
