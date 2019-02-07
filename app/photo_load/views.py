@@ -9,6 +9,7 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
 )
 
+from app.face_recognition.async_fd_runner import get_faces
 from .models import Photo, Storage
 from .serializers import PhotoSerializer
 
@@ -70,7 +71,8 @@ class PhotoView(viewsets.GenericViewSet):
             photo_serializer = PhotoSerializer(data=data)
 
             if photo_serializer.is_valid():
-                photo_serializer.create(validated_data=data)
+                photo = photo_serializer.create(validated_data=data)
+                get_faces(photo.storage_id)
                 status_list.append('Success')
             else:
                 status_list.append('Fail')

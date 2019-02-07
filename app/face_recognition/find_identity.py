@@ -1,11 +1,17 @@
 import numpy as np
+from celery import Celery
 
 from .models import Face, Avatar
 
-threshold = 0.8   # if we find a face, such that the distance between the found face and the given face
-                # is smaller than a threshold, than we suppose it is the same avatar
+app = Celery('tasks', broker='pyamqp://guest@localhost//')
 
 
+# if we find a face, such that the distance between the found face and the
+# given face is smaller than a threshold, than we suppose it is the same avatar
+threshold = 0.8
+
+
+@app.task
 def get_identity(face_id):
     face_input = Face.objects.filter(id=face_id).first()
     faces_query = Face.objects.filter(avatar__isnull=False)
