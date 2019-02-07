@@ -1,20 +1,15 @@
 import os
 
+from yaml import load
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Create file 'secret_key' with the secret for your product
-# SECURITY WARNING: keep the secret key used in production secret!
-with open(os.path.join(BASE_DIR, 'photoclo/secret_key')) as file:
-    SECRET_KEY = file.read()
-
-# Create file 'debug' in this directory, to enable debug mode
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.path.exists(os.path.join(BASE_DIR, 'photoclo/debug'))
-
-ALLOWED_HOSTS = []
-
+with open(os.path.join(BASE_DIR, 'configs', 'settings.yaml')) as file:
+    temp = load(file)
+    SECRET_KEY = temp['secret key']
+    DEBUG = temp['debug']
+    ALLOWED_HOSTS = temp['allowed hosts']
 
 # Application definition
 
@@ -64,18 +59,11 @@ WSGI_APPLICATION = 'photoclo.wsgi.application'
 
 
 # File with database configuration, separated by new line
-with open(os.path.join(BASE_DIR, 'photoclo/database.config')) as file:
-    db_config = file.read().split()
+with open(os.path.join(BASE_DIR, 'configs', 'database_config.yaml')) as file:
+    db_config = load(file)
 
 DATABASES = {
-    'default': {
-        'ENGINE': db_config[0],
-        'NAME': db_config[1],
-        'USER': db_config[2],
-        'PASSWORD': db_config[3] if db_config != 'NULL' else None,
-        'HOST': db_config[4],
-        'PORT': db_config[5],
-    }
+    'default': db_config,
 }
 
 
@@ -120,8 +108,16 @@ STATIC_URL = '/static/'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
     )
 }
 
 MEDIA_ROOT = 'media/'
 MEDIA_URL = '/media/'
+
+with open(os.path.join(BASE_DIR, 'configs', 'face_detection_config.yaml'))\
+        as file:
+
+    FACE_DETECTION_URLS = load(file)

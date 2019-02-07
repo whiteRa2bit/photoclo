@@ -1,5 +1,4 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
@@ -14,8 +13,6 @@ from .serializers import FaceSerializer, AvatarSerializer
 
 
 class FaceView(viewsets.ViewSet):
-    permission_classes = (IsAuthenticated,)
-
     def retrieve(self, request, pk):
         faces = Face.objects.filter(photo__owner=request.user).filter(photo=pk)
         if len(faces) == 0:
@@ -38,8 +35,6 @@ class FaceView(viewsets.ViewSet):
 
 
 class AvatarView(viewsets.ViewSet):
-    permission_classes = (IsAuthenticated,)
-
     def list(self, request, pk=None):
         avatars = Avatar.objects.filter(face__photo__owner=request.user)
         if len(avatars) == 0:

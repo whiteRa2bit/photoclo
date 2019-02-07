@@ -1,9 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
+
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
@@ -72,11 +73,3 @@ def sign_up(request):
 def sign_out(request):
     logout(request)
     return Response(status=HTTP_200_OK)
-
-
-@csrf_exempt
-@api_view(["GET"])
-@permission_classes((IsAuthenticated,))
-def test_api(request):
-    data = {'sample_data': 123}
-    return Response(data, status=HTTP_200_OK)
