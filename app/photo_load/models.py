@@ -9,7 +9,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
 from wand.image import Image
 
-sizes = {'o': 'max', 'z': 1080, 'y': 807, 'x': 604, 'm': 130, 's': 100}
+# sizes = {'o': 'max', 'z': 1080, 'y': 807, 'x': 604, 'm': 130, 's': 100}
+sizes = {'o': 'max', 'z': 1080}
 
 
 def get_upload_path(instance, filename):
@@ -24,30 +25,30 @@ def get_upload_path_size_z(instance, filename):
     return instance.get_upload_path("z_{0}".format(filename))
 
 
-def get_upload_path_size_y(instance, filename):
-    return instance.get_upload_path("y_{0}".format(filename))
-
-
-def get_upload_path_size_x(instance, filename):
-    return instance.get_upload_path("x_{0}".format(filename))
-
-
-def get_upload_path_size_m(instance, filename):
-    return instance.get_upload_path("m_{0}".format(filename))
-
-
-def get_upload_path_size_s(instance, filename):
-    return instance.get_upload_path("s_{0}".format(filename))
+# def get_upload_path_size_y(instance, filename):
+#     return instance.get_upload_path("y_{0}".format(filename))
+#
+#
+# def get_upload_path_size_x(instance, filename):
+#     return instance.get_upload_path("x_{0}".format(filename))
+#
+#
+# def get_upload_path_size_m(instance, filename):
+#     return instance.get_upload_path("m_{0}".format(filename))
+#
+#
+# def get_upload_path_size_s(instance, filename):
+#     return instance.get_upload_path("s_{0}".format(filename))
 
 
 class Storage(models.Model):
     original = models.FileField(upload_to=get_upload_path)
     o_size = models.ImageField(upload_to=get_upload_path_size_o)
     z_size = models.ImageField(upload_to=get_upload_path_size_z)
-    y_size = models.ImageField(upload_to=get_upload_path_size_y)
-    x_size = models.ImageField(upload_to=get_upload_path_size_x)
-    m_size = models.ImageField(upload_to=get_upload_path_size_m)
-    s_size = models.ImageField(upload_to=get_upload_path_size_s)
+    # y_size = models.ImageField(upload_to=get_upload_path_size_y)
+    # x_size = models.ImageField(upload_to=get_upload_path_size_x)
+    # m_size = models.ImageField(upload_to=get_upload_path_size_m)
+    # s_size = models.ImageField(upload_to=get_upload_path_size_s)
 
     def __init__(self, *args, **kwargs):
         super(Storage, self).__init__(*args, **kwargs)
@@ -60,10 +61,10 @@ class Storage(models.Model):
         if not self.id:
             self.o_size = self.compress('o')
             self.z_size = self.compress('z')
-            self.y_size = self.compress('y')
-            self.x_size = self.compress('x')
-            self.m_size = self.compress('m')
-            self.s_size = self.compress('s')
+            # self.y_size = self.compress('y')
+            # self.x_size = self.compress('x')
+            # self.m_size = self.compress('m')
+            # self.s_size = self.compress('s')
 
         super(Storage, self).save(*args, **kwargs)
 

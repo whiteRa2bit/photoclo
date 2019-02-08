@@ -69,7 +69,7 @@ class PhotoView(viewsets.GenericViewSet):
 
             if photo_serializer.is_valid():
                 photo = photo_serializer.create(validated_data=data)
-                get_faces(photo.storage_id)
+                get_faces.apply_async((photo.storage_id,), countdown=2)
                 status_list.append('Success')
             else:
                 status_list.append('Fail')
