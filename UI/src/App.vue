@@ -2,11 +2,40 @@
 
     <div id="app">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+        <b-navbar toggleable="md" type="dark" v-if="authenticated" variant="info" sticky="true">
 
+          <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
+          <b-navbar-brand href="photoclo.ru:8000">PHOTOCLO</b-navbar-brand>
 
+          <b-collapse is-nav id="nav_collapse" right>
 
+            <b-navbar-nav class="ml-auto">
 
+              <div class="container h-100">
+              <div class="d-flex justify-content-center h-100">
+                <div class="searchbar">
+                  <input class="search_input" type="text" name="" placeholder="Search...">
+                  <a href="#" class="search_icon"><i class="fas fa-search"></i></a>
+                </div>
+              </div>
+            </div>
+
+              <b-button v-b-modal.uploadModal v-on:click='updateToken()' right>Загрузить</b-button>
+
+                <b-modal id="uploadModal" title="Загрузка фотографий">
+                    <multiple-file-uploader id="fileUploader" postURL="/api/photos/" successMessagePath="" errorMessagePath=""></multiple-file-uploader>
+                </b-modal>
+
+              <b-dropdown right text="Пользователь" class="m-md-2" style="margin: 0px !important; margin-left: 5px; margin-right: 5px">
+                <b-dropdown-item href="#">Профиль</b-dropdown-item>
+                <b-dropdown-item v-on:click="logout()">Выйти</b-dropdown-item>
+              </b-dropdown>
+            </b-navbar-nav>
+
+          </b-collapse>
+        </b-navbar>
         <router-view @authenticated="setAuthenticated" />
     </div>
 </template>
