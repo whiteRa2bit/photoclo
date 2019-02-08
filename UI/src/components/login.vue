@@ -39,7 +39,6 @@
             login() {
                 if(!this.empty) {
                     var this_ = this;
-                    console.log("kek");
                     axios.post('/api/sign_in/', {username: this.input.username,
                         password: this.input.password})
                         .then(function (response) {

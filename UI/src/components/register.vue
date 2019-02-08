@@ -53,9 +53,6 @@
                         console.log(error);
                         this_.incorrect = true;
                     })
-                    /*localStorage.token = 228;
-                    this.$emit("authenticated", true);
-                    this.$router.replace({ name: "secure" });*/
                 }
             },
             toLoginPage() {

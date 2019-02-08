@@ -14,10 +14,10 @@
 
 <style scoped>
     #imageItem {
-    	width: 300px;
+    	height: 200px;
     	border: 2px black;
-    	margin-bottom: 10px;
-    	margin-top: 10px;
+    	margin-bottom: 8px;
+    	margin-top: 8px;
     	margin-left: 2px;
     	margin-right: 2px;
     }
