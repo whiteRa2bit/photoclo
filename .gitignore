@@ -103,6 +103,9 @@ venv.bak/
 #node_modules
 UI/node_modules/
 
+#.idea
+fr/model/.idea/
+
 # mypy
 <<<<<<< HEAD
 .mypy_cache/
