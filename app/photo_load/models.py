@@ -107,6 +107,8 @@ class Photo(models.Model):
             subprocess.run(['exiftool', '-TagsFromFile',
                             self.storage.original.path, size.path],
                            stdout=subprocess.PIPE)
+            subprocess.run(['exiftran', '-ai', size.path],
+                           stdout=subprocess.PIPE)
 
         with Image(blob=self.storage.o_size.file) as image:
             self.width, self.height = image.size
