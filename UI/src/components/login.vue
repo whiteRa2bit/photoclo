@@ -6,15 +6,32 @@
             <span class="error" v-if="incorrect">*Логин или пароль введены не верно.</span>
             <div class="user-input-wrp">
                 <br/>
-                <input type="text" class="input" id="loginField" name="username" v.model="input.username" v-on:change="updateUsername" autofocus required tabindex="1" />
+                <input
+                        type="text"
+                        class="input"
+                        id="loginField"
+                        name="username"
+                        ref="username"
+                        v.model="input.username"
+                        v-on:keyup.enter="login"
+                        v-on:change="updateUsername">
                 <span class="floating-label">Логин</span>
             </div>
             <div class="user-input-wrp">
                 <br/>
-                <input type="password" class="input" id="passwordField" name="password" v.model="input.password" v-on:change="updatePassword" required tabindex="2" />
+                <input
+                        type="password"
+                        class="input"
+                        id="passwordField"
+                        name="password"
+                        ref="password"
+                        v.model="input.password"
+                        v-on:keyup.enter="login"
+                        v-on:change="updatePassword"
+                        required tabindex="2" />
                 <span class="floating-label">Пароль</span>
             </div>
-            <button class="button" id="loginButton" form="login" type="button" v-on:click="login()" tabindex="3"><span>Вход</span></button>
+            <button class="button" id="loginButton" form="login" type="button" v-on:keyup.enter="login" v-on:click="login()" tabindex="3"><span>Вход</span></button>
         </div>
         <button class="button" id="registerButton" form="login" type="button" v-on:click="toRegisterPage()" tabindex="4">Еще нет аккаунта? Зарегистрируйтесь!</button>
     </form>
@@ -30,14 +47,20 @@
                 incorrect: false,
                 info: "",
                 input: {
-                    username: "",
-                    password: ""
+                    username: null,
+                    password: null
                 }
             }
         },
         methods: {
             login() {
-                if(!this.empty) {
+                if (!(this.input.username && this.input.password)) {
+                    if (!this.input.username) {
+                        this.$refs.username.focus()
+                    } else {
+                        this.$refs.password.focus()
+                    }
+                } else {
                     var this_ = this;
                     axios.post('/api/sign_in/', {username: this.input.username,
                         password: this.input.password})
@@ -46,9 +69,10 @@
                             this_.$emit("authenticated", true);
                             this_.$router.replace({ name: "secure" });
                         }).catch(function (error) {
-                            console.log(error);
-                            this_.incorrect = true;
-                        });
+                        console.log(error);
+                        this_.incorrect = true;
+                    });
+
                 }
             },
             toRegisterPage() {
@@ -63,7 +87,7 @@
                 else {
                     this.empty = false;
                 }
-            }, 
+            },
             updatePassword(event) {
                 this.input.password = event.target.value;
                 this.incorrect = false;
@@ -84,7 +108,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: space-around;
-        width: 30%; 
+        width: 30%;
         min-width: 300px;
         border: 1px solid #CCCCCC;
         background-color: #FFFFFF;

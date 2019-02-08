@@ -103,5 +103,11 @@ venv.bak/
 # mkdocs documentation
 /site
 
+#node_modules
+UI/node_modules/
+
+#.idea
+fr/model/.idea/
+
 # mypy
 .mypy_cache/
