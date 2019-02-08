@@ -2,9 +2,9 @@
     <div class="gallery">
         <imageItem v-for="(image, index) in images" v-on:click.native='clicked(index)' v-bind:imageURL="image.url"/>
 
-        <div id="myModal" class="modal">
-            <div class="modal-content">
-                <imageWBBItem id="imageBigShow" v-bind:image="this.images[this.index]" />
+        <div id="myModal" class="imageModal">
+            <div class="image-modal-content">
+                <imageWBBItem id="imageBigShow" v-bind:faces="this.faces" v-bind:image="this.images[this.index]" />
             </div>
             <span class="close" id="closeImageButton">&times;</span>
         </div>
@@ -15,14 +15,16 @@
 
 <script>
     import imageItem from './imageItem.vue';
-    import imageWBBItem from './imageWBBItem';
+    import imageWBBItem from './imageWBBItem.vue';
+    import axios from 'axios';
 
-    window.onload = function() { 
+    window.onload = function() {
         var modal = document.getElementById('myModal');
 
         var span = document.getElementById('closeImageButton'); 
 
         span.onclick = function() {
+            this.index = null;
             modal.style.display = "none";
         }
     }
@@ -45,20 +47,35 @@
             return {
                 index: null,
                 imagenowURL: '',
+                faces: {},
             };
         },
         watch: {
             index(value) {
                 this.imagenowURL = this.images[value];
+                this.getFaces();
             },
         },
         methods: {
             clicked(index) {
                 this.index = index;
-                console.log(index);
                 var modal = document.getElementById('myModal');
-                modal.style.display = "block";
+                modal.style.display = "flex";
             },
+            getFaces() {
+                var this_ = this;
+                if (!this_.images || ! this_.index) {
+                    this_.faces = {};
+                    return;
+                }
+                axios.get('api/faces/' + String(this_.images[this_.index].id) + '/', { headers: {Authorization: "Token " + localStorage.token}}).then(function (response) {
+                        console.log('faces = ', response.data.faces);
+                        this_.faces = response.data.faces;
+                }).catch(function (error) {
+                    console.log(error);
+                    this_.faces = {};
+                });
+            }
         }
     }
 </script>
@@ -68,15 +85,19 @@
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        justify-content: space-around;
+        justify-content: space-between;
         margin: 10px;
     }
 
-    .modal {
+    .imageModal {
         display: none; /* Hidden by default */
         position: fixed; /* Stay in place */
+        justify-content: space-around;
+        align-content: center;
+        align-items: center;
+        align-self: center;
         z-index: 1; /* Sit on top */
-        padding-top: 100px; /* Location of the box */
+        padding-top: 300px; /* Location of the box */
         left: 0;
         top: 0;
         width: 100%; /* Full width */
@@ -87,19 +108,21 @@
     }
 
     /* Modal Content (Image) */
-    .modal-content {
+    .image-modal-content {
         display: flex;
+        margin: auto;
         justify-content: space-around;
         align-content: center;
-        width: 80%;
-        height: 100%;
-        background-color: rgba(1, 1, 1, 0) !important;
-        color: blue;
+        align-self: center;
+        align-items: center;
+        width: auto;
+        height: auto;
+        background-color: rgba(0, 0, 0, 0) !important;
 
     }
     
     /* Add Animation - Zoom in the Modal */
-    .modal-content { 
+    .image-modal-content { 
         animation-name: zoom;
         animation-duration: 0.6s;
     }

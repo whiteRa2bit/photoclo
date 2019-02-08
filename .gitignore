@@ -31,8 +31,8 @@ MANIFEST
 *.manifest
 *.spec
 
+#node_modules
 UI/node_modules/
-*.zip
 
 # Installer logs
 pip-log.txt
@@ -110,8 +110,4 @@ UI/node_modules/
 fr/model/.idea/
 
 # mypy
-<<<<<<< HEAD
 .mypy_cache/
-=======
-.mypy_cache/
->>>>>>> remotes/dima/master

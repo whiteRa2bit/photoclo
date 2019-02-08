@@ -53,9 +53,7 @@
         mounted() {
             var this_ = this;
             axios.get('/api/photos/', { headers: {Authorization: "Token " + localStorage.token}, params: {offset: 0, limit: 2000, size: "o"}}).then(function (response) {
-                console.log(response);
                 for (var i = 0; i < response.data.photos.length; ++i) {
-                    console.log(response.data.photos[i]);
                     this_.images.push(response.data.photos[i]);
                 }
             }).catch(function (error) {
