@@ -1,27 +1,19 @@
 <template>
-    <div id="secure">
-        <div class="imageView">
-            <gallery :images="images" :index="index" @close="index = null"></gallery>
-            <div
-                class="image"
-                v-for="(image, imageIndex) in images"
-                :key="imageIndex"
-                @click="index = imageIndex"
-                :style="{ backgroundImage: 'url(' + image + ')', width: '300px', height: '200px' }"
-            ></div>
-        </div>
-    </div>
+    <gallery v-bind:images="images" />
 </template>
 
 <script>
 
-    import VueGallery from 'vue-gallery';
+    import gallery from './gallery.vue';
     import uploader from 'vue-simple-uploader';
     import axios from 'axios';
 
+    import imageItem from './imageItem.vue'; 
+
     export default {
         components: {
-            'gallery': VueGallery
+            gallery,
+            imageItem
         },
         name: 'Secure',
         data() {
@@ -36,16 +28,13 @@
                 console.log(response);
                 for (var i = 0; i < response.data.photos.length; ++i) {
                     console.log(response.data.photos[i]);
-                    this_.images.push(response.data.photos[i].url);
+                    this_.images.push(response.data.photos[i]);
                 }
             }).catch(function (error) {
                 console.log(error);
             })
         },
         methods: {
-            add() {
-                this.images.push('https://dummyimage.com/800/ffffff/000000');
-            }
         }
     }
 </script>

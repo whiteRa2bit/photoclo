@@ -62,6 +62,7 @@
                     }
                 } else {
                     var this_ = this;
+                    console.log("kek");
                     axios.post('/api/sign_in/', {username: this.input.username,
                         password: this.input.password})
                         .then(function (response) {
@@ -72,8 +73,7 @@
                         console.log(error);
                         this_.incorrect = true;
                     });
-                    /*this_.$emit("authenticated", true);
-                    this_.$router.replace({ name: "secure" });*/
+
                 }
             },
             toRegisterPage() {
