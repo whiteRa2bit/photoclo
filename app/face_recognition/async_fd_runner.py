@@ -13,7 +13,6 @@ site_url = settings.FACE_DETECTION_URLS['compressed photo storage']
 
 
 @app.task
-@app.task
 def get_faces(photo_id):
     storage = Storage.objects.filter(photo=photo_id).first().z_size
     storage_url = '{0}{1}'.format(site_url, storage.url)
@@ -34,16 +33,13 @@ def get_faces(photo_id):
 
 
 def get_new_bounding_boxes(photo_id, faces):
-    photo = Photo.objects.filter(id=photo_id).first()
+    photo = Photo.objects.filter(storage_id=photo_id).first()
     h = photo.height
     w = photo.width
-    if h <= w and h > sizes['z']:
-        coef = h / sizes['z']
-        for i in range(len(faces)):
-            faces[i]['bounding_box'] = faces[i]['bounding_box'] * coef
-    elif w <= h and w > sizes['z']:
-        coef = w / sizes['z']
-        for i in range(len(faces)):
-            faces[i]['bounding_box'] = faces[i]['bounding_box'] * coef
+    min_side = min(h, w)
+    coef = 1 if min_side < sizes['z'] else min_side / sizes['z']
+    for i in range(len(faces)):
+        faces[i]['bounding_box'] = [int(j * coef) for j in
+                                    faces[i]['bounding_box']]
     return faces
 
