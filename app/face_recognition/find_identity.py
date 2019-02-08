@@ -8,13 +8,15 @@ app = Celery('tasks', broker='pyamqp://guest@localhost//')
 
 # if we find a face, such that the distance between the found face and the
 # given face is smaller than a threshold, than we suppose it is the same avatar
-threshold = 0.8
+threshold = 0.9
 
 
 @app.task
-def get_identity(face_id):
-    face_input = Face.objects.filter(id=face_id).first()
-    faces_query = Face.objects.filter(avatar__isnull=False)
+def get_identity(face_id, user_id):
+    face_input = Face.objects.filter(photo__owner=user_id)\
+        .filter(id=face_id).first()
+    faces_query = Face.objects.filter(photo__owner=user_id)\
+        .filter(avatar__isnull=False)
 
     embedding_input = face_input.embedding
     embedding_input = np.array(embedding_input)

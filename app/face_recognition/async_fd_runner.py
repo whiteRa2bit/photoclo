@@ -13,8 +13,9 @@ site_url = settings.FACE_DETECTION_URLS['compressed photo storage']
 
 
 @app.task
-def get_faces(photo_id):
-    storage = Storage.objects.filter(photo=photo_id).first().z_size
+def get_faces(photo_id, user_id):
+    storage = Storage.objects.filter(photo__owner=user_id)\
+        .filter(photo=photo_id).first().z_size
     storage_url = '{0}{1}'.format(site_url, storage.url)
     data = requests.get(fd_url, params={'url': storage_url}).json()
     faces = [{'bounding_box': data['boxes'][i],
@@ -26,7 +27,7 @@ def get_faces(photo_id):
         if serializer.is_valid(raise_exception=True):
             faces = serializer.save()
             for face in faces:
-                get_identity(face.id)
+                get_identity(face.id, user_id)
     photo = Photo.objects.filter(storage_id=photo_id).first()
     photo.checked = True
     photo.save()
