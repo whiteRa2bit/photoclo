@@ -3,10 +3,21 @@
         <imageItem v-for="(image, index) in images" v-on:click.native='clicked(index)' v-bind:imageURL="image.url"/>
 
         <div id="myModal" class="imageModal">
-            <div class="image-modal-content">
-                <imageWBBItem id="imageBigShow" v-bind:faces="this.faces" v-bind:image="this.images[this.index]" />
-            </div>
+            
             <span class="close" id="closeImageButton">&times;</span>
+            <div class='innerContent'>
+                <div class="carouselButton" v-on:click="prev()">
+                    <span >&#8249;</span>
+                </div>
+                <div id="overIBS">
+                    <div class="image-modal-content">
+                        <imageWBBItem id="imageBigShow" v-bind:faces="this.faces" v-bind:image="this.images[this.index]" />
+                    </div>
+                </div>
+                <div class="carouselButton" v-on:click="next()">
+                    <span>&#8250;</span>
+                </div>
+            </div>
         </div>
 
  
@@ -56,6 +67,9 @@
                 this.getFaces();
             },
         },
+        created: function () {
+            document.onkeydown= this.onkeydown;
+        },
         methods: {
             clicked(index) {
                 this.index = index;
@@ -64,17 +78,42 @@
             },
             getFaces() {
                 var this_ = this;
-                if (!this_.images || ! this_.index) {
+                if (!this_.images || !this_.index && this.index != 0) {
                     this_.faces = {};
                     return;
                 }
                 axios.get('api/faces/' + String(this_.images[this_.index].id) + '/', { headers: {Authorization: "Token " + localStorage.token}}).then(function (response) {
-                        console.log('faces = ', response.data.faces);
                         this_.faces = response.data.faces;
                 }).catch(function (error) {
-                    console.log(error);
                     this_.faces = {};
                 });
+            },
+            next() {
+                this.index += 1;
+                if (this.index == this.images.length) {
+                    this.index = 0;
+                }
+            },
+            prev() {
+                this.index -= 1;
+                if (this.index < 0) {
+                    this.index = this.images.length - 1;
+                }
+            },
+            close() {
+                this.index = null;
+                document.getElementById('myModal').style.display = "none";
+            },
+            onkeydown(e) {
+                if (e.key == "Escape") {
+                    this.close();
+                }
+                else if (e.key == "ArrowRight") {
+                   this.next();
+                }
+                else if (e.key == "ArrowLeft"){
+                    this.prev();
+                }
             }
         }
     }
@@ -92,14 +131,11 @@
     .imageModal {
         display: none; /* Hidden by default */
         position: fixed; /* Stay in place */
-        justify-content: space-around;
-        align-content: center;
-        align-items: center;
-        align-self: center;
         z-index: 1; /* Sit on top */
-        padding-top: 300px; /* Location of the box */
+        padding-top: 0px; /* Location of the box */
         left: 0;
         top: 0;
+        justify-content: space-around;
         width: 100%; /* Full width */
         height: 100%; /* Full height */
         overflow: auto; /* Enable scroll if needed */
@@ -110,15 +146,11 @@
     /* Modal Content (Image) */
     .image-modal-content {
         display: flex;
-        margin: auto;
         justify-content: space-around;
-        align-content: center;
-        align-self: center;
-        align-items: center;
-        width: auto;
+        alignment-baseline: central;
+        width: 100%;
         height: auto;
-        background-color: rgba(0, 0, 0, 0) !important;
-
+        max-height: 
     }
     
     /* Add Animation - Zoom in the Modal */
@@ -135,18 +167,55 @@
     /* The Close Button */
     .close {
         position: absolute;
-        top: 15px;
-        right: 35px;
-        color: #FFFFFF !important;
-        font-size: 40px;
-        font-weight: bold;
+        top: 0px;
+        right: 0px;
+        color: #BBB;
+        font-size: 30px;
         transition: 0.3s;
     }
 
     .close:hover,
     .close:focus {
-        color: #bbb;
+        color: #FFF !important;
         text-decoration: none;
         cursor: pointer;
+    }
+
+    .carouselButton {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        text-align: center;
+        width: 5%;
+        font: 40px;
+        color: #BBB !important;
+        background-color: rgba(0, 0, 0, 0) !important;
+        height: 100% !important;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .carouselButton:hover,
+    .carouselButton:focus {
+        color: #FFF;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .innerContent {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        alignment-baseline: central;
+    }
+
+    #overIBS {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
     }
 </style>

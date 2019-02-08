@@ -21,6 +21,7 @@
                 <br/>
                 <input
                         type="password"
+                        autocomplete="off"
                         class="input"
                         id="passwordField"
                         name="password"

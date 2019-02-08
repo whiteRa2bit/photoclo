@@ -1,5 +1,5 @@
 <template>
-    <gallery v-bind:images="images" />
+    <gallery v-bind:images="images"/>
 </template>
 
 <script>
@@ -24,15 +24,28 @@
         },
         mounted() {
             var this_ = this;
-            axios.get('/api/photos/', { headers: {Authorization: "Token " + localStorage.token}, params: {offset: 0, limit: 2000, size: "o"}}).then(function (response) {
+            axios.get('/api/photos/', { headers: {Authorization: "Token " + localStorage.token}, params: {offset: 0, limit: 2000, size: "z"}}).then(function (response) {
                 for (var i = 0; i < response.data.photos.length; ++i) {
                     this_.images.push(response.data.photos[i]);
                 }
+                console.log(response);
             }).catch(function (error) {
                 console.log(error);
-            })
+            });
         },
         methods: {
+            updateImages() {
+                var this_ = this;
+                axios.get('/api/photos/', { headers: {Authorization: "Token " + localStorage.token}, params: {offset: 0, limit: 2000, size: "z"}}).then(function (response) {
+                    this_.images = [];
+                    for (var i = 0; i < response.data.photos.length; ++i) {
+                        this_.images.push(response.data.photos[i]);
+                    }
+                    console.log(response);
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
         }
     }
 </script>
