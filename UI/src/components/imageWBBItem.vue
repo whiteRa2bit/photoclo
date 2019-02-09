@@ -2,7 +2,7 @@
     <div id="id1">
     	<div class="myContainer">
         	<img id="image-WBB-Item" v-bind:src="image.url" alt="" />
-            <bbButton class="btn" v-for="(face, index) in faces" v-bind:style="getStyle(index)"/>
+            <bbButton class="btn" v-for="(face, index) in faces" v-bind:face="face" v-bind:srcHeight="image.height" v-bind:srcWidth="image.width" v-bind:avatar="avatars[face.avatar]"/>
         </div>
     </div>
 </template>
@@ -14,6 +14,9 @@
 		name: 'imageWBBItem',
         components: {
             bbButton
+        },
+        mounted: function() {
+            console.log(this.avatars);
         },
 		props: {
             image: {
@@ -27,34 +30,24 @@
                 default() {
                     return {};
                 }
-            }
+            },
+            avatars: {
+                type: Object,
+                default() {
+                    return {};
+                }
+            },
         },
-        methods: {
-            getStyle(index) {
-                console.log('Voop-Voop-Voop');
-                var x1 = this.faces[index].bounding_box[0];
-                var y1 = this.faces[index].bounding_box[1];
-                var x2 = this.faces[index].bounding_box[2];
-                var y2 = this.faces[index].bounding_box[3];
-                var height = y2 - y1;
-                var width = x2 - x1;
-                var st = '';
-                console.log(x1, y1, x2, y2, this.image.height, this.image.width);
-                st = st + 'height: ' + String(height * 100 / this.image.height) + '%;';
-                st = st + 'width: ' + String(width * 100 / this.image.width) + '%;';
-                st = st + 'left: ' + String((x1 + x2) * 50 / this.image.width) + '%;';
-                st = st + 'top: ' + String((y1 + y2) * 50 / this.image.height) + '%;';
-                console.log('its a sound of the police');
-                console.log(st);
-                return st;
-            }
-        }
+        methods: {}
 	}
 </script>
 
 <style scoped>
     #image-WBB-Item {
-        image-orientation: from-image;
+        width: auto;
+        height: auto;
+        max-height: 90vh;
+        max-width: 90vw;
     }
 
     #id1 {

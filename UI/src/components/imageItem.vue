@@ -14,7 +14,6 @@
 
 <style scoped>
     #imageItem {
-        image-orientation: from-image;
     	height: 150px;
     	border: 2px black;
     	margin-bottom: 8px;

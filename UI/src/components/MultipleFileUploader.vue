@@ -217,7 +217,6 @@ export default {
                 axios({method: this.method, url: this.postURL, data: this.formData,headers:this.postHeader})
                     .then((response) => {
                         this.isLoaderVisible = false;
-                        console.log('kek1');
                         this.$emit('upload-success');
                         // Show success message
                         if(this.showHttpMessages)

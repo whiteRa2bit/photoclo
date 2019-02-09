@@ -3,7 +3,6 @@
         <imageItem v-for="(image, index) in images" v-on:click.native='clicked(index)' v-bind:imageURL="image.url"/>
 
         <div id="myModal" class="imageModal">
-            
             <span class="close" id="closeImageButton">&times;</span>
             <div class='innerContent'>
                 <div class="carouselButton" v-on:click="prev()">
@@ -11,7 +10,7 @@
                 </div>
                 <div id="overIBS">
                     <div class="image-modal-content">
-                        <imageWBBItem id="imageBigShow" v-bind:faces="this.faces" v-bind:image="this.images[this.index]" />
+                        <imageWBBItem id="imageBigShow" v-bind:faces="this.faces" v-bind:image="this.images[this.index]" v-bind:avatars="this.avatarsById"/>
                     </div>
                 </div>
                 <div class="carouselButton" v-on:click="next()">
@@ -44,7 +43,7 @@
         name: 'gallery',
         components: {
             imageItem,
-            imageWBBItem
+            imageWBBItem,
         },
         props: {
             images: {
@@ -53,12 +52,19 @@
                   return [];
               }
             },
+            avatars: {
+                type: Array,
+                default () {
+                    return [];
+                }
+            },
         },
         data() {
             return {
                 index: null,
                 imagenowURL: '',
                 faces: {},
+                avatarsById: {},
             };
         },
         watch: {
@@ -69,6 +75,11 @@
         },
         created: function () {
             document.onkeydown= this.onkeydown;
+        },
+        mounted: function () {
+            for (var avatar in this.avatars) {
+                this.avatarsById[avatar.id] = avatar;
+            }
         },
         methods: {
             clicked(index) {
@@ -167,8 +178,8 @@
     /* The Close Button */
     .close {
         position: absolute;
-        top: 0px;
-        right: 0px;
+        top: 10px;
+        right: 20px;
         color: #BBB;
         font-size: 30px;
         transition: 0.3s;

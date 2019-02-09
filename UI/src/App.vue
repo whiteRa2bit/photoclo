@@ -98,7 +98,6 @@
                 });
             },
             updateImages() {
-                console.log("kek");
                 this.$refs.child.updateImages();
             }
         },
