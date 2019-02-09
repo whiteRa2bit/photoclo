@@ -14,7 +14,7 @@
 
 <style scoped>
     #imageItem {
-    	height: 200px;
+    	height: 150px;
     	border: 2px black;
     	margin-bottom: 8px;
     	margin-top: 8px;

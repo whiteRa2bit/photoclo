@@ -2,48 +2,50 @@
 
     <div id="app">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        
-        <b-navbar toggleable="md" type="dark" v-if="authenticated" variant="info" sticky="true">
 
-          <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+        <b-navbar v-if="authenticated" toggleable="md" type="dark" variant="info">
 
-          <b-navbar-brand href="photoclo.ru:8000">PHOTOCLO</b-navbar-brand>
+            <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-          <b-collapse is-nav id="nav_collapse" right>
+            <b-navbar-brand href="photoclo.ru:8000">PHOTOCLO</b-navbar-brand>
 
-            <b-navbar-nav class="ml-auto">
+            <b-collapse is-nav id="nav_collapse">
 
-              <div class="container h-100">
-              <div class="d-flex justify-content-center h-100">
-                <div class="searchbar">
-                  <input class="search_input" type="text" name="" placeholder="Search...">
-                  <a href="#" class="search_icon"><i class="fas fa-search"></i></a>
-                </div>
-              </div>
-            </div>
 
-              <b-button v-b-modal.uploadModal v-on:click='updateToken()' right>Загрузить</b-button>
 
-                <b-modal id="uploadModal" title="Загрузка фотографий">
-                    <multiple-file-uploader id="fileUploader" postURL="/api/photos/" successMessagePath="" errorMessagePath=""></multiple-file-uploader>
-                </b-modal>
+                <!-- Right aligned nav items -->
+                <b-navbar-nav class="ml-auto">
 
-              <b-dropdown right text="Пользователь" class="m-md-2" style="margin: 0px !important; margin-left: 5px; margin-right: 5px">
-                <b-dropdown-item href="#">Профиль</b-dropdown-item>
-                <b-dropdown-item v-on:click="logout()">Выйти</b-dropdown-item>
-              </b-dropdown>
-            </b-navbar-nav>
+                    <form class="form-inline md-form form-sm mt-0">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <input class="form-control form-control ml-3 w-75" type="text" placeholder="Поиск" aria-label="Search">
+                    </form>
 
-          </b-collapse>
+
+                    <b-button v-b-modal.uploadModal class="mr-sm-2" v-on:click="updateToken(); updateModalShown" right>Загрузить</b-button>
+                    <!--<span> myUploader.data().toClose </span>-->
+                    <b-modal v-if="isModalShown" id="uploadModal" ref="uploadModal" hide-footer=true @hide="canselUploader" title="Загрузка фотографий">
+                        <myUploader ref="myUploader" v-on:closeModal="updateModalShown" url="http://photoclo.ru:8000/api/photos/"> </myUploader>
+                        <!--
+                        <multiple-file-uploader id="fileUploader" postURL="/api/photos/" successMessagePath="" errorMessagePath="" @upload-success='updateImages' @upload-error='updateImages'></multiple-file-uploader>
+                        --->
+                    </b-modal>
+                    <b-dropdown right text="Пользователь"  class="mr-sm-2">
+                        <b-dropdown-item href="#">Профиль</b-dropdown-item>
+                        <b-dropdown-item v-on:click="logout()">Выйти</b-dropdown-item>
+                    </b-dropdown>
+                </b-navbar-nav>
+
+            </b-collapse>
         </b-navbar>
-        <router-view @authenticated="setAuthenticated" />
+        <router-view @authenticated="setAuthenticated" ref="child" />
     </div>
 </template>
 
 <script>
     import axios from 'axios';
-    import MultipleFileUploader from '@updivision/vue2-multi-uploader';
-
+    import MultipleFileUploader from './components/MultipleFileUploader.vue';
+    import myUploader from './components/myUploader.vue'
     var modal = document.getElementById('id01');
 
     window.onclick = function(event) {
@@ -54,7 +56,7 @@
 
     window.onload = function() {
         var this_ = this;
-        document.getElementsByClassName('uploadBox')[0].__vue__.$props.postHeader = {Authorization: "Token " + localStorage.token};
+        document.getElementsByClassName('myUploader')[0].__vue__.$props.my_header = {Authorization: "Token " + localStorage.token};
     }
 
     export default {
@@ -63,12 +65,15 @@
             return {
                 authenticated: false,
                 token: undefined,
+                isModalShown: false
             }
         },
         components: {
-            MultipleFileUploader
+            MultipleFileUploader,
+            myUploader
         },
         mounted() {
+
             if (localStorage.hasOwnProperty('token')) {
                 this.token = localStorage.token;
                 this.authenticated = true;
@@ -81,9 +86,12 @@
                 this.$router.replace({name: "secure"});
             }
         },
+
         methods: {
             updateToken () {
-                document.getElementsByClassName('uploadBox')[0].__vue__.$props.postHeader = {Authorization: "Token " + localStorage.token};
+                this.isModalShown = true;
+                console.log(localStorage.token);
+                document.getElementsByClassName('myUploadBox')[0].__vue__.$props.my_header = {Authorization: "Token " + localStorage.token};
             },
             setAuthenticated(status) {
                 this.authenticated = status;
@@ -95,6 +103,18 @@
                     this_.$router.replace({ name: "login" });
                     delete localStorage.token;
                 });
+            },
+            updateImages() {
+                this.$refs.child.updateImages();
+            },
+            updateModalShown: function () {
+                console.log("inside updateModalShown")
+                this.isModalShown = !this.isModalShown;
+            },
+            canselUploader() {
+                console.log("inside canselUploader")
+                this.$refs.uploadModal.html = "";
+                this.$refs.myUploader.resetUploader();
             }
         },
     }

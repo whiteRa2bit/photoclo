@@ -1,7 +1,9 @@
 <template>
-	<div class="myContainer">
-    	<img id="image-WBB-Item" v-bind:src="image.url" alt="" />
-        <bbButton class="btn" v-for="(face, index) in faces" v-bind:srcWidth="image.width" v-bind:srcHeight="image.height" v-bind:face="face" v-bind:ids="index" />
+    <div id="id1">
+    	<div class="myContainer">
+        	<img id="image-WBB-Item" v-bind:src="image.url" alt="" />
+            <bbButton class="btn" v-for="(face, index) in faces" v-bind:face="face" v-bind:srcHeight="image.height" v-bind:srcWidth="image.width" v-bind:avatar="avatars[face.avatar]"/>
+        </div>
     </div>
 </template>
 
@@ -12,6 +14,9 @@
 		name: 'imageWBBItem',
         components: {
             bbButton
+        },
+        mounted: function() {
+            console.log(this.avatars);
         },
 		props: {
             image: {
@@ -25,7 +30,13 @@
                 default() {
                     return {};
                 }
-            }
+            },
+            avatars: {
+                type: Object,
+                default() {
+                    return {};
+                }
+            },
         },
         methods: {}
 	}
@@ -33,18 +44,31 @@
 
 <style scoped>
     #image-WBB-Item {
-        margin: auto;
-        overflow: auto;
-        display: block;
+        width: auto;
+        height: auto;
+        max-height: 90vh;
+        max-width: 90vw;
+    }
+
+    #id1 {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        width: 100%;
+        height: 100%;
     }
 
     .myContainer {
+        position: relative;
+        width: 100%;
+        height: auto;
     }
 
     /* Make the image responsive */
     .myContainer img {
         width: 100%;
-        height: auto;
+        max-width: 100%;
+        max-height: 100%;
     }
 
     /* Style the button and place it in the middle of the container/image */
@@ -53,10 +77,7 @@
         transform: translate(-50%, -50%);
         -ms-transform: translate(-50%, -50%);
         border: none;
-        cursor: pointer;    
-    }
-
-    .myContainer .btn:hover {
-        background-color: black;
+        cursor: pointer;
+        border-radius: 5px;
     }
 </style>
