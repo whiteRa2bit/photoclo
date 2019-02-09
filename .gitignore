@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+configs/
+web/static/web
+
+app/face_detection.config
+app/face_recognition/face_detection.config
+
+web/templates
