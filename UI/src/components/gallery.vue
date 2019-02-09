@@ -1,6 +1,6 @@
 <template>
     <div class="gallery">
-        <imageItem v-for="(image, index) in images" v-on:click.native='clicked(index)' v-bind:imageURL="image.url"/>
+        <imageItem v-for="(image, index) in images" v-on:click.native='clicked(index)' v-bind:imageURL="image.url" v-bind:style="styles[index]"/>
 
         <div id="myModal" class="imageModal">
             <span class="close" id="closeImageButton">&times;</span>
@@ -63,8 +63,8 @@
             return {
                 index: null,
                 imagenowURL: '',
-                faces: {},
-                avatarsById: {},
+                faces: [],
+                recompute: 0,
             };
         },
         watch: {
@@ -74,18 +74,69 @@
             },
         },
         created: function () {
-            document.onkeydown= this.onkeydown;
+            document.onkeydown = this.onkeydown;
+            window.addEventListener('resize', this.updateStyles);
+            this.updateStyles();
         },
-        mounted: function () {
-            for (var avatar in this.avatars) {
-                this.avatarsById[avatar.id] = avatar;
+        destroyed() {
+            window.removeEventListener('resize', this.updateStyles);
+        },
+        computed: {
+            avatarsById: function() {
+                var avatarsById = {};
+                for (var i = 0; i < this.avatars.length; ++i) {
+                    avatarsById[this.avatars[i].id] = this.avatars[i];
+                }
+                return avatarsById;
+            },
+            styles: function() {
+                this.recompute;
+                var st = [];
+                var w = window.innerWidth - 10;
+                for (var i = 0; i < this.images.length; ++i) {
+                    var j = i;
+                    var sum = 0;
+                    while (j < this.images.length && (j == i || sum + Math.ceil(this.images[j].width * 200 / this.images[j].height) + 10 <= w)) {
+                        sum += Math.ceil(this.images[j].width * 200 / this.images[j].height) + 10;
+                        ++j;
+                    }
+                    var h1 = Math.floor(199 * (w - (j - i) * 10) / (sum - (j - i) * 10));
+                    if (j == this.images.length) {
+                        for (var k = i; k < j; ++k) {
+                            st.push('height: ' + h1 + 'px !important;');
+                        }
+                    }
+                    else {
+                        var sum2 = sum;
+                        sum2 += Math.ceil(this.images[j].width * 200 / this.images[j].height) + 10;
+                        var h2 = Math.floor(199 * (w - (j - i + 1) * 10) / (sum2 - (j - i + 1) * 10));
+                        if (Math.abs(h2 / 200 - 1) < Math.abs(h1 / 200 - 1)) {
+                            for (var k = i; k <= j; ++k) {
+                                st.push('height: ' + h2 + 'px !important;');
+                            }
+                            ++j;
+                        }
+                        else {
+                            for (var k = i; k < j; ++k) {
+                                st.push('height: ' + h1 + 'px !important;');
+                            }
+                        }
+                    }
+                    i = j - 1;
+                }
+                return st;
             }
         },
+        mounted: function () {},
         methods: {
             clicked(index) {
                 this.index = index;
                 var modal = document.getElementById('myModal');
                 modal.style.display = "flex";
+            },
+            updateStyles() {
+                console.log("update");
+                this.recompute += 1;
             },
             getFaces() {
                 var this_ = this;
@@ -93,25 +144,34 @@
                     this_.faces = {};
                     return;
                 }
-                axios.get('api/faces/' + String(this_.images[this_.index].id) + '/', { headers: {Authorization: "Token " + localStorage.token}}).then(function (response) {
+                axios.get('/api/faces/' + String(this_.images[this_.index].id) + '/', { headers: {Authorization: "Token " + localStorage.token}}).then(function (response) {
                         this_.faces = response.data.faces;
                 }).catch(function (error) {
                     this_.faces = {};
                 });
             },
+            deleteLastFaces() {
+                var arr = document.getElementsByClassName('mybbButton');
+                for (var i = 0; i < arr.length; ++i) {
+                    arr[i].style.display = "none";
+                }
+            },
             next() {
+                this.deleteLastFaces()
                 this.index += 1;
                 if (this.index == this.images.length) {
                     this.index = 0;
                 }
             },
             prev() {
+                this.deleteLastFaces()
                 this.index -= 1;
                 if (this.index < 0) {
                     this.index = this.images.length - 1;
                 }
             },
             close() {
+                this.deleteLastFaces()
                 this.index = null;
                 document.getElementById('myModal').style.display = "none";
             },
@@ -136,7 +196,7 @@
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: space-between;
-        margin: 10px;
+        margin: 5px;
     }
 
     .imageModal {
@@ -180,7 +240,7 @@
         position: absolute;
         top: 10px;
         right: 20px;
-        color: #BBB;
+        color: #FFF !important; 
         font-size: 30px;
         transition: 0.3s;
     }

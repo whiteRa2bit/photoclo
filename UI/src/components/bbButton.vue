@@ -1,11 +1,10 @@
 <template>
     <div class="dropdown mybbButton" v-bind:style="getStyle()">
-        <input type="text" v-bind:id="'faceInput' + face.id" class="nameInput" placeholder="Кто это?" required v-bind:id="'faceInput' + face.id" v-on:change="updateName" v-on:keyup.enter="inputSubmit()"  />
+        <input type="text" v-bind:id="'faceInput' + face.id" class="nameInput" placeholder="Кто это?" required v-on:change="updateName" v-on:keyup.enter="inputSubmit()"  />
     </div>
 </template>
 
 <script>
-
     import axios from 'axios';
 
     var pixelWidth = require('string-pixel-width');
@@ -13,7 +12,7 @@
     function resizable (el, factor) {
         var int = Number(factor) || 7.7;
         function resize() {
-            el.style.width = String(pixelWidth(el.value, {size: 20}) + 10) + 'px';
+            el.style.width = String(Math.max(100, pixelWidth(el.value, {size: 20}) + 10)) + 'px';
         }
         var e = 'keyup,keypress,focus,blur,change'.split(',');
         for (var i in e) el.addEventListener(e[i],resize,false);
@@ -23,8 +22,10 @@
 	export default {
 		name: 'bbButton',
 		props: ['srcWidth', 'srcHeight', 'face', 'avatar'],
-        data: {
-            name: ''
+        data() {
+            return {
+                name: ''
+            };
         },
         watch: {},
         mounted: function () {
@@ -35,6 +36,8 @@
                 inp.value = this.avatar.name;
                 inp.disabled = true;
                 inp.style.width = String(pixelWidth(inp.value, {size: 20}) + 10) + 'px';
+                inp.style.color = "#CCC !important";
+                inp.style.backgroundColor = "rgba(0, 0, 0, 0.5) !important";
             }
         },
 		methods: {
@@ -91,14 +94,12 @@
         align-self: center;
         display: none;
         font-size: 20px;
-        width: auto;
         height: auto;
-        min-width: 100px;
         top: 100%;
         border: 2px solid white;
         border-radius: 2px;
+        width: 100px;
         transition: width 0.05s;
-        width: 100%;
         text-align: center;
     }
 

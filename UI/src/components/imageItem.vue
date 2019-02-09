@@ -1,10 +1,9 @@
 <template>
-	<div>
-    	<img id="imageItem" v-bind:src="imageURL" alt=""/>
-	</div>
+    <img id="imageItem" v-bind:src="imageURL" alt=""/>
 </template>
 
 <script>
+    
 	export default {
 		name: 'imageItem',
 		props: ['imageURL'],
@@ -14,12 +13,8 @@
 
 <style scoped>
     #imageItem {
-    	height: 150px;
-    	border: 2px black;
-    	margin-bottom: 8px;
-    	margin-top: 8px;
-    	margin-left: 2px;
-    	margin-right: 2px;
+    	border: 0px black;
+        margin: 5px;
     }
 
     #imageItem:hover {

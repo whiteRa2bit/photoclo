@@ -22,12 +22,14 @@
                     </form>
 
 
-                    <b-button v-b-modal.uploadModal class="mr-sm-2" v-on:click='updateToken()' right>Загрузить</b-button>
-
-                    <b-modal id="uploadModal" title="Загрузка фотографий">
+                    <b-button v-b-modal.uploadModal class="mr-sm-2" v-on:click="updateToken(); updateModalShown" right>Загрузить</b-button>
+                    <!--<span> myUploader.data().toClose </span>-->
+                    <b-modal v-if="isModalShown" id="uploadModal" ref="uploadModal" hide-footer=true @hide="canselUploader" title="Загрузка фотографий">
+                        <myUploader ref="myUploader" v-on:closeModal="updateModalShown" url="http://photoclo.ru:8000/api/photos/" @upload-image-success='updateImages' @upload-image-failure='updateImages'> </myUploader>
+                        <!--
                         <multiple-file-uploader id="fileUploader" postURL="/api/photos/" successMessagePath="" errorMessagePath="" @upload-success='updateImages' @upload-error='updateImages'></multiple-file-uploader>
+                        --->
                     </b-modal>
-
                     <b-dropdown right text="Пользователь"  class="mr-sm-2">
                         <b-dropdown-item href="#">Профиль</b-dropdown-item>
                         <b-dropdown-item v-on:click="logout()">Выйти</b-dropdown-item>
@@ -43,7 +45,7 @@
 <script>
     import axios from 'axios';
     import MultipleFileUploader from './components/MultipleFileUploader.vue';
-
+    import myUploader from './components/myUploader.vue'
     var modal = document.getElementById('id01');
 
     window.onclick = function(event) {
@@ -54,7 +56,7 @@
 
     window.onload = function() {
         var this_ = this;
-        document.getElementsByClassName('uploadBox')[0].__vue__.$props.postHeader = {Authorization: "Token " + localStorage.token};
+        document.getElementsByClassName('myUploader')[0].__vue__.$props.my_header = {Authorization: "Token " + localStorage.token};
     }
 
     export default {
@@ -63,12 +65,15 @@
             return {
                 authenticated: false,
                 token: undefined,
+                isModalShown: false
             }
         },
         components: {
-            MultipleFileUploader
+            MultipleFileUploader,
+            myUploader
         },
         mounted() {
+
             if (localStorage.hasOwnProperty('token')) {
                 this.token = localStorage.token;
                 this.authenticated = true;
@@ -81,10 +86,12 @@
                 this.$router.replace({name: "secure"});
             }
         },
-        
+
         methods: {
             updateToken () {
-                document.getElementsByClassName('uploadBox')[0].__vue__.$props.postHeader = {Authorization: "Token " + localStorage.token};
+                this.isModalShown = true;
+                console.log(localStorage.token);
+                document.getElementsByClassName('myUploadBox')[0].__vue__.$props.my_header = {Authorization: "Token " + localStorage.token};
             },
             setAuthenticated(status) {
                 this.authenticated = status;
@@ -99,6 +106,15 @@
             },
             updateImages() {
                 this.$refs.child.updateImages();
+            },
+            updateModalShown: function () {
+                console.log("inside updateModalShown")
+                this.isModalShown = !this.isModalShown;
+            },
+            canselUploader() {
+                console.log("inside canselUploader")
+                this.$refs.uploadModal.html = "";
+                this.$refs.myUploader.resetUploader();
             }
         },
     }
