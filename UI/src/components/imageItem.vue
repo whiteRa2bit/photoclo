@@ -1,5 +1,5 @@
 <template>
-    <img id="imageItem" v-bind:src="imageURL" alt=""/>
+    <img id="imageItem" v-bind:src="'http://photoclo.ru:8000' + imageURL" alt=""/>
 </template>
 
 <script>
@@ -13,8 +13,10 @@
 
 <style scoped>
     #imageItem {
-    	border: 0px black;
+    	border: 1px solid black;
         margin: 5px;
+        margin-top: 10px;
+        margin-bottom: 10px;
     }
 
     #imageItem:hover {

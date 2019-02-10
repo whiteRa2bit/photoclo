@@ -30,9 +30,8 @@
         watch: {},
         mounted: function () {
             resizable(document.getElementById('faceInput' + String(this.face.id)), 13);
-            if (this.face.user_checked) {
+            if (this.avatar.name != "New Avatar") {
                 var inp = document.getElementById('faceInput' + this.face.id);
-                console.log(this.avatar);
                 inp.value = this.avatar.name;
                 inp.disabled = true;
                 inp.style.width = String(pixelWidth(inp.value, {size: 20}) + 10) + 'px';
@@ -62,7 +61,8 @@
                 var inp = document.getElementById('faceInput' + this.face.id);
                 inp.disabled = true;
                 var this_ = this;
-                axios({ method: 'PATCH', url: '/api/avatars/' + this_.face.avatar + '/', headers: { Authorization: "Token " + localStorage.token}, data: {'new_name': this_.name, 'face': this_.face.id }}).then(function(response) {
+                this.avatar.name = this.name;
+                axios({ method: 'PATCH', url: 'http://photoclo.ru:8000/api/avatars/' + this_.face.avatar + '/', headers: { Authorization: "Token " + localStorage.token}, data: {'new_name': this_.name, 'face': this_.face.id }}).then(function(response) {
                 }).catch(function (error) {
                     console.log(error);
                 });

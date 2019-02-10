@@ -22,13 +22,10 @@
                     </form>
 
 
-                    <b-button v-b-modal.uploadModal class="mr-sm-2" v-on:click="updateToken(); updateModalShown" right>Загрузить</b-button>
+                    <b-button v-b-modal.uploadModal class="mr-sm-2" v-on:click="updateToken(); isModalShown = true; resetUploader()" right>Загрузить</b-button>
                     <!--<span> myUploader.data().toClose </span>-->
-                    <b-modal v-if="isModalShown" id="uploadModal" ref="uploadModal" hide-footer=true @hide="canselUploader" title="Загрузка фотографий">
-                        <myUploader ref="myUploader" v-on:closeModal="updateModalShown" url="http://photoclo.ru:8000/api/photos/" @upload-image-success='updateImages' @upload-image-failure='updateImages'> </myUploader>
-                        <!--
-                        <multiple-file-uploader id="fileUploader" postURL="/api/photos/" successMessagePath="" errorMessagePath="" @upload-success='updateImages' @upload-error='updateImages'></multiple-file-uploader>
-                        --->
+                    <b-modal id="uploadModal" ref="uploadModal" hide-footer=true title="Загрузка фотографий">
+                        <myUploader ref="myUploader" v-on:closeModal="isModalShown = false;" url="http://photoclo.ru:8000/api/photos/" @upload-image-success='updateImages();' @upload-image-failure='updateImages();'> </myUploader>
                     </b-modal>
                     <b-dropdown right text="Пользователь"  class="mr-sm-2">
                         <b-dropdown-item href="#">Профиль</b-dropdown-item>
@@ -65,32 +62,41 @@
             return {
                 authenticated: false,
                 token: undefined,
-                isModalShown: false
+                isModalShown: false,
             }
         },
         components: {
             MultipleFileUploader,
             myUploader
         },
+        watch: {
+            isModalShown(value) {
+                if (value) {
+                    this.$refs.uploadModal.show();
+                }
+                else {
+                    this.$refs.uploadModal.hide();
+                }
+            }
+        },
         mounted() {
-
             if (localStorage.hasOwnProperty('token')) {
                 this.token = localStorage.token;
                 this.authenticated = true;
             }
+            console.log(this.authenticated);
             if(!this.authenticated) {
+                console.log("lol");
                 this.$router.replace({ name: "login" });
             }
             else {
-                var this_ = this;
+                console.log("kek");
                 this.$router.replace({name: "secure"});
             }
         },
 
         methods: {
             updateToken () {
-                this.isModalShown = true;
-                console.log(localStorage.token);
                 document.getElementsByClassName('myUploadBox')[0].__vue__.$props.my_header = {Authorization: "Token " + localStorage.token};
             },
             setAuthenticated(status) {
@@ -98,7 +104,7 @@
             },
             logout() {
                 var this_ = this;
-                axios.post('/api/sign_out/', {Authorization: "Token " + String(this.token)}).then(function () {
+                axios.post('http://photoclo.ru:8000/api/sign_out/', {Authorization: "Token " + String(this.token)}).then(function () {
                     this_.authenticated = false;
                     this_.$router.replace({ name: "login" });
                     delete localStorage.token;
@@ -107,15 +113,9 @@
             updateImages() {
                 this.$refs.child.updateImages();
             },
-            updateModalShown: function () {
-                console.log("inside updateModalShown")
-                this.isModalShown = !this.isModalShown;
-            },
-            canselUploader() {
-                console.log("inside canselUploader")
-                this.$refs.uploadModal.html = "";
+            resetUploader() {
                 this.$refs.myUploader.resetUploader();
-            }
+            },
         },
     }
 </script>
@@ -123,7 +123,6 @@
 <style>
     body {
         background-color: #E0E0E0;
-        background-image: url("background.jpg");
     }
     h1 {
         padding: 0;

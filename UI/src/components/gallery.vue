@@ -3,7 +3,7 @@
         <imageItem v-for="(image, index) in images" v-on:click.native='clicked(index)' v-bind:imageURL="image.url" v-bind:style="styles[index]"/>
 
         <div id="myModal" class="imageModal">
-            <span class="close" id="closeImageButton">&times;</span>
+            <span class="closeCarousel" id="closeImageButton">&times;</span>
             <div class='innerContent'>
                 <div class="carouselButton" v-on:click="prev()">
                     <span >&#8249;</span>
@@ -27,17 +27,6 @@
     import imageItem from './imageItem.vue';
     import imageWBBItem from './imageWBBItem.vue';
     import axios from 'axios';
-
-    window.onload = function() {
-        var modal = document.getElementById('myModal');
-
-        var span = document.getElementById('closeImageButton'); 
-
-        span.onclick = function() {
-            this.index = null;
-            modal.style.display = "none";
-        }
-    }
 
     export default {
         name: 'gallery',
@@ -65,6 +54,7 @@
                 imagenowURL: '',
                 faces: [],
                 recompute: 0,
+                lastTime: 0,
             };
         },
         watch: {
@@ -100,16 +90,24 @@
                         sum += Math.ceil(this.images[j].width * 200 / this.images[j].height) + 10;
                         ++j;
                     }
-                    var h1 = Math.floor(199 * (w - (j - i) * 10) / (sum - (j - i) * 10));
+                    var h1 = Math.floor(195 * (w - (j - i) * 10) / (sum - (j - i) * 10));
                     if (j == this.images.length) {
-                        for (var k = i; k < j; ++k) {
-                            st.push('height: ' + h1 + 'px !important;');
+                        if (h1 < 250) {
+                            for (var k = i; k < j; ++k) {
+                                st.push('height: ' + h1 + 'px !important;');
+                            }
+                        }
+                        else {
+                            for (var k = i; k < j - 1; ++k) {
+                                st.push('height: ' + 200 + 'px !important;');
+                            }
+                            st.push('height: 200px !important; margin-right: auto !important; margin-left: 5px;');
                         }
                     }
                     else {
                         var sum2 = sum;
                         sum2 += Math.ceil(this.images[j].width * 200 / this.images[j].height) + 10;
-                        var h2 = Math.floor(199 * (w - (j - i + 1) * 10) / (sum2 - (j - i + 1) * 10));
+                        var h2 = Math.floor(195 * (w - (j - i + 1) * 10) / (sum2 - (j - i + 1) * 10));
                         if (Math.abs(h2 / 200 - 1) < Math.abs(h1 / 200 - 1)) {
                             for (var k = i; k <= j; ++k) {
                                 st.push('height: ' + h2 + 'px !important;');
@@ -127,7 +125,16 @@
                 return st;
             }
         },
-        mounted: function () {},
+        mounted: function () {
+            var modal = document.getElementById('myModal');
+
+            var span = document.getElementById('closeImageButton'); 
+            span.onclick = function() {
+                console.log("darova");
+                this.index = null;
+                modal.style.display = "none";
+            }
+        },
         methods: {
             clicked(index) {
                 this.index = index;
@@ -135,8 +142,8 @@
                 modal.style.display = "flex";
             },
             updateStyles() {
-                console.log("update");
                 this.recompute += 1;
+                this.lastTime = (new Date()).getTime();
             },
             getFaces() {
                 var this_ = this;
@@ -144,7 +151,7 @@
                     this_.faces = {};
                     return;
                 }
-                axios.get('/api/faces/' + String(this_.images[this_.index].id) + '/', { headers: {Authorization: "Token " + localStorage.token}}).then(function (response) {
+                axios.get('http://photoclo.ru:8000/api/faces/' + String(this_.images[this_.index].id) + '/', { headers: {Authorization: "Token " + localStorage.token}}).then(function (response) {
                         this_.faces = response.data.faces;
                 }).catch(function (error) {
                     this_.faces = {};
@@ -235,18 +242,23 @@
         to {transform:scale(1)}
     }
 
-    /* The Close Button */
     .close {
+        outline: none !important;
+        border: 0px !important;
+    }
+
+    /* The Close Button */
+    .closeCarousel {
         position: absolute;
         top: 10px;
         right: 20px;
-        color: #FFF !important; 
+        color: #999 !important; 
         font-size: 30px;
         transition: 0.3s;
     }
 
-    .close:hover,
-    .close:focus {
+    .closeCarousel:hover,
+    .closeCarousel:focus {
         color: #FFF !important;
         text-decoration: none;
         cursor: pointer;
@@ -259,7 +271,7 @@
         text-align: center;
         width: 5%;
         font: 40px;
-        color: #BBB !important;
+        color: #CCC !important;
         background-color: rgba(0, 0, 0, 0) !important;
         height: 100% !important;
         font-weight: bold;
