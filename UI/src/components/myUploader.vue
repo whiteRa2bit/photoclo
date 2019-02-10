@@ -42,7 +42,7 @@
         props: {
             my_header: {
                 type: [Object],
-                default: () => {}
+                default: () => {return {Authorization: "Token " + localStorage.token};}
             },
             input_id: {
                 type: String,
@@ -154,21 +154,17 @@
                 return true;
             },
             _xhr: function(formData, keys, callback){
-                console.log("_xhr try to send")
                 const this_ = this;
                 this.onUploading = true;
                 this.$emit('upload-image-attempt', formData);
                 keys.forEach((key) => {
                     this.$set(this.files[key], 'attempted', true);
                 });
-                console.log("Try to post")
-                console.log(this.url)
-                console.log(this.my_header)
                 axios({method: 'post', url:this.url, data:formData, headers:this.my_header}).then((response) => {
                     keys.forEach((key) => {
                         this.$set(this.files[key], 'uploaded', true);
-                        // this_.total++;
                     });
+                    console.log(response);
                     this.$emit('upload-image-success', [formData, response]);
                 }, (response) => {
                     this.$emit('upload-image-failure', [formData, response]);
@@ -179,7 +175,6 @@
             },
             upload: function(){
                 if(!this._can_xhr()) return false;
-                console.log("In upload func")
                 for (let key in this.files) {
                     if(!this._can_upload_file(key)) continue;
                     let formData = new FormData();
@@ -213,16 +208,14 @@
                 }
             },
             submit: function(e){
-                console.log("Try to submit")
                 e.preventDefault(); e.stopPropagation();
                 if(!this.onUploading){
                     if(this.max_batch > 1){
-                        console.log("Batch")
                         this.create_batch();
                         return this.upload_batch();
                     }
-                    console.log("No batch")
                     this.upload();
+                    this.$emit('closeModal');
                 }
             },
             dragEnter: function(e){
@@ -307,12 +300,18 @@
                 e.preventDefault(); e.stopPropagation();
             },
             close: function(e) {
-                console.log("Try to hide")
                 e.preventDefault(); e.stopPropagation();
                 this.$emit('closeModal')
             },
             resetUploader() {
-                this.$emit('closeModal')
+                this.index = 0;
+                this.total = 0;
+                this.files = {};
+                this.image = {};
+                this.batch = {};
+                this.onDragover = false;
+                this.onUploading = false;
+                //this.$emit('closeModal');
             }
 
         }
@@ -418,4 +417,4 @@
         color: red;
         text-align: left;
     }
-</style>
+</style> q

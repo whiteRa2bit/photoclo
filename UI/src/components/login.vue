@@ -1,5 +1,5 @@
 <template>
-    <form id="login" align="center">
+    <form id="login" v-on:submit.prevent="login" align="center">
         <h1>Вход</h1>
         <div class="inputFields">
             <span class="error" v-if="empty">*Все поля должны быть заполнены.</span>
@@ -13,7 +13,6 @@
                         name="username"
                         ref="username"
                         v.model="input.username"
-                        v-on:keyup.enter="login"
                         v-on:change="updateUsername">
                 <span class="floating-label">Логин</span>
             </div>
@@ -26,14 +25,12 @@
                         name="password"
                         ref="password"
                         v.model="input.password"
-                        v-on:keyup.enter="login"
-                        v-on:change="updatePassword"
-                        required tabindex="2" />
+                        v-on:change="updatePassword"/>
                 <span class="floating-label">Пароль</span>
             </div>
-            <button class="button" id="loginButton" form="login" type="button" v-on:keyup.enter="login" v-on:click="login()" tabindex="3"><span>Вход</span></button>
+            <button class="button" id="loginButton" form="login" type="button""><span>Вход</span></button>
         </div>
-        <button class="button" id="registerButton" form="login" type="button" v-on:click="toRegisterPage()" tabindex="4">Еще нет аккаунта? Зарегистрируйтесь!</button>
+        <button class="button" id="registerButton" form="login" type="button" v-on:click="toRegisterPage()">Еще нет аккаунта? Зарегистрируйтесь!</button>
     </form>
 </template>
 

@@ -16,24 +16,33 @@
                 <!-- Right aligned nav items -->
                 <b-navbar-nav class="ml-auto">
 
-                    <form class="form-inline md-form form-sm mt-0">
-                        <i class="fas fa-search" aria-hidden="true"></i>
-                        <input class="form-control form-control ml-3 w-75" type="text" placeholder="Поиск" aria-label="Search">
-                    </form>
+                    <!--     Search     -->
+                    <!--<form class="form-inline md-form form-sm mt-0">-->
+                        <!--<i class="fas fa-search" aria-hidden="true"></i>-->
+                        <!--<input class="form-control form-control ml-3 w-75" type="text" placeholder="Поиск" aria-label="Search">-->
+                    <!--</form>-->
 
-
-                    <b-button v-b-modal.uploadModal class="mr-sm-2" v-on:click="updateToken(); updateModalShown" right>Загрузить</b-button>
+                    <div id="uploadIcon" v-on:click="startUpload">
+                        <div id="uploadImg" v-on:click="updateToken()" slot="button-content"><img src="https://i.ibb.co/KxpYbZc/Webp-net-resizeimage-5.png" /></div>
+                        <b-button id="uploadButton" ref="uploadButton" v-b-modal.uploadModal class="mr-sm-2" v-on:click="updateToken(); isModalShown = true; resetUploader()" right>Загрузить</b-button>
+                    </div>
                     <!--<span> myUploader.data().toClose </span>-->
-                    <b-modal v-if="isModalShown" id="uploadModal" ref="uploadModal" hide-footer=true @hide="canselUploader" title="Загрузка фотографий">
-                        <myUploader ref="myUploader" v-on:closeModal="updateModalShown" url="http://photoclo.ru:8000/api/photos/"> </myUploader>
-                        <!--
-                        <multiple-file-uploader id="fileUploader" postURL="/api/photos/" successMessagePath="" errorMessagePath="" @upload-success='updateImages' @upload-error='updateImages'></multiple-file-uploader>
-                        --->
+                    <b-modal id="uploadModal" ref="uploadModal" hide-footer=true title="Загрузка фотографий">
+                        <myUploader ref="myUploader" v-on:closeModal="isModalShown = false;" url="http://photoclo.ru:8000/api/photos/" @upload-image-success='updateImages();' @upload-image-failure='updateImages();'> </myUploader>
                     </b-modal>
-                    <b-dropdown right text="Пользователь"  class="mr-sm-2">
-                        <b-dropdown-item href="#">Профиль</b-dropdown-item>
-                        <b-dropdown-item v-on:click="logout()">Выйти</b-dropdown-item>
-                    </b-dropdown>
+
+                    <div id="yandexDiskIcon">
+                        <div id="yandexDiskImg"><img src="https://i.ibb.co/QbRbLYx/rsz-yandex-icon.png" class="d-inline-block align-top"></div>
+                        <span> Яндекс.Диск </span>
+                    </div>
+
+                    <div id="userIcon">
+                        <b-dropdown id="userButton" right text="Пользователь"  class="mr-sm-2" no-caret variant="link">
+                            <div id="userImg" slot="button-content"><img src="https://i.ibb.co/rHPWQ14/Webp-net-resizeimage-4.png" /></div>
+                            <b-dropdown-item href="#">Профиль</b-dropdown-item>
+                            <b-dropdown-item v-on:click="logout()">Выйти</b-dropdown-item>
+                        </b-dropdown>
+                    </div>
                 </b-navbar-nav>
 
             </b-collapse>
@@ -65,12 +74,22 @@
             return {
                 authenticated: false,
                 token: undefined,
-                isModalShown: false
+                isModalShown: false,
             }
         },
         components: {
             MultipleFileUploader,
             myUploader
+        },
+        watch: {
+            isModalShown(value) {
+                if (value) {
+                    this.$refs.uploadModal.show();
+                }
+                else {
+                    this.$refs.uploadModal.hide();
+                }
+            }
         },
         mounted() {
 
@@ -89,8 +108,6 @@
 
         methods: {
             updateToken () {
-                this.isModalShown = true;
-                console.log(localStorage.token);
                 document.getElementsByClassName('myUploadBox')[0].__vue__.$props.my_header = {Authorization: "Token " + localStorage.token};
             },
             setAuthenticated(status) {
@@ -98,7 +115,7 @@
             },
             logout() {
                 var this_ = this;
-                axios.post('/api/sign_out/', {Authorization: "Token " + String(this.token)}).then(function () {
+                axios.post('http://photoclo.ru:8000/api/sign_out/', {Authorization: "Token " + String(this.token)}).then(function () {
                     this_.authenticated = false;
                     this_.$router.replace({ name: "login" });
                     delete localStorage.token;
@@ -107,14 +124,11 @@
             updateImages() {
                 this.$refs.child.updateImages();
             },
-            updateModalShown: function () {
-                console.log("inside updateModalShown")
-                this.isModalShown = !this.isModalShown;
-            },
-            canselUploader() {
-                console.log("inside canselUploader")
-                this.$refs.uploadModal.html = "";
+            resetUploader() {
                 this.$refs.myUploader.resetUploader();
+            },
+            startUpload() {
+                this.$refs.uploadButton.click();
             }
         },
     }
@@ -138,7 +152,7 @@
     }
 
     button:hover {
-      opacity: 0.8;
+        opacity: 0.8;
     }
 
     .dropAreaDragging{
@@ -184,4 +198,35 @@
         border-radius: 50%;
         color:white;
     }
+    #userButton {
+
+    }
+    #yandexDiskIcon {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        margin-right: 20px;
+        margin-left: 20px;
+    }
+    #yandexDiskImg {
+
+    }
+    #uploadIcon {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        cursor: pointer;
+    }
+    #userImg {
+        height: auto;
+        width: auto;
+    }
+    #uploadButton {
+        height: auto;
+        font-size: 12px;
+        color: black;
+        background-color: white;
+        text-align: center;
+    }
 </style>
+

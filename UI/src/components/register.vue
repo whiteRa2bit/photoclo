@@ -1,5 +1,5 @@
 <template>
-    <form id="register" align="center">
+    <form id="register" v-on:submit.prevent="register" align="center">
         <h1>Регистрация</h1>
         <div class="inputFields">
             <span v-if="empty" class="error">*Все поля должны быть заполнены.</span>
@@ -17,8 +17,7 @@
                         v-on:change="updateUsername"
                         v-on:keyup.enter="register"
                         autofocus required
-                        align="center"
-                        tabindex="1" />
+                        align="center"/>
                 <span class="floating-label">Логин</span>
             </div>
             <div class="user-input-wrp">
@@ -31,8 +30,7 @@
                         ref="password"
                         v.model="input.password"
                         v-on:change="updatePassword"
-                        v-on:keyup.enter="register"
-                        required tabindex="2" />
+                        v-on:keyup.enter="register"/>
                 <span class="floating-label">Пароль</span>
             </div>
             <div class="user-input-wrp">
@@ -44,8 +42,7 @@
                         ref="confirm_password"
                         v.model="input.confirm_password"
                         v-on:change="updateConfirmPassword"
-                        v-on:keyup.enter="register"
-                        required tabindex="3" />
+                        v-on:keyup.enter="register"/>
                 <span class="floating-label">Подтвердите пароль</span>
             </div>
             <div class="user-input-wrp">
@@ -58,13 +55,12 @@
                         ref="email"
                         v.model="input.email"
                         v-on:change="updateEmail"
-                        v-on:keyup.enter="register"
-                        required tabindex="4" />
+                        v-on:keyup.enter="register"/>
                 <span class="floating-label">Электронная почта</span>
             </div>
-            <button class="button" id="registerButton" form="register" type="button" v-on:click="register()" tabindex="5"><span>Регистрация</span></button>
+            <button class="button" id="registerButton" form="register" type="button" v-on:click="register()"><span>Регистрация</span></button>
         </div>
-        <button class="button" id="loginButton" form="register" type="button" v-on:click="toLoginPage()" tabindex="6">Уже есть аккаунт? Войти.</button>
+        <button class="button" id="loginButton" form="register" type="button" v-on:click="toLoginPage()">Уже есть аккаунт? Войти.</button>
     </form>
 </template>
 
