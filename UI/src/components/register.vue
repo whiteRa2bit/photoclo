@@ -30,7 +30,8 @@
                         ref="password"
                         v.model="input.password"
                         v-on:change="updatePassword"
-                        v-on:keyup.enter="register"/>
+                        v-on:keyup.enter="register"
+                        required/>
                 <span class="floating-label">Пароль</span>
             </div>
             <div class="user-input-wrp">
@@ -42,7 +43,8 @@
                         ref="confirm_password"
                         v.model="input.confirm_password"
                         v-on:change="updateConfirmPassword"
-                        v-on:keyup.enter="register"/>
+                        v-on:keyup.enter="register"
+                        required/>
                 <span class="floating-label">Подтвердите пароль</span>
             </div>
             <div class="user-input-wrp">
@@ -55,7 +57,8 @@
                         ref="email"
                         v.model="input.email"
                         v-on:change="updateEmail"
-                        v-on:keyup.enter="register"/>
+                        v-on:keyup.enter="register"
+                        required/>
                 <span class="floating-label">Электронная почта</span>
             </div>
             <button class="button" id="registerButton" form="register" type="button" v-on:click="register()"><span>Регистрация</span></button>
@@ -101,7 +104,7 @@
                         if (this.input.password != this.input.confirm_password) {
                             this.passwords_are_equal = false;
                         } else {
-                            axios.post('/api/sign_up/', {username: this.input.username, password: this.input.password, email: this.input.email}).then(function (response) {
+                            axios.post('http://photoclo.ru:8000/api/sign_up/', {username: this.input.username, password: this.input.password, email: this.input.email}).then(function (response) {
                                 localStorage.token = response.data.token;
                                 this_.$emit("authenticated", true);
                                 this_.$router.replace({ name: "secure" });

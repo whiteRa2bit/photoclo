@@ -13,7 +13,9 @@
                         name="username"
                         ref="username"
                         v.model="input.username"
-                        v-on:change="updateUsername">
+                        v-on:change="updateUsername"
+                        autofocus
+                        required/>
                 <span class="floating-label">Логин</span>
             </div>
             <div class="user-input-wrp">
@@ -25,12 +27,13 @@
                         name="password"
                         ref="password"
                         v.model="input.password"
-                        v-on:change="updatePassword"/>
+                        v-on:change="updatePassword"
+                        required/>
                 <span class="floating-label">Пароль</span>
             </div>
-            <button class="button" id="loginButton" form="login" type="button""><span>Вход</span></button>
+            <button class="loginPageButton" id="loginButton" form="login" type="submit""><span>Вход</span></button>
         </div>
-        <button class="button" id="registerButton" form="login" type="button" v-on:click="toRegisterPage()">Еще нет аккаунта? Зарегистрируйтесь!</button>
+        <button class="loginPageButton" id="registerButton" form="login" type="button" v-on:click="toRegisterPage()">Еще нет аккаунта? Зарегистрируйтесь!</button>
     </form>
 </template>
 
@@ -59,7 +62,7 @@
                     }
                 } else {
                     var this_ = this;
-                    axios.post('/api/sign_in/', {username: this.input.username,
+                    axios.post('http://photoclo.ru:8000/api/sign_in/', {username: this.input.username,
                         password: this.input.password})
                         .then(function (response) {
                             localStorage.token = response.data.token;
@@ -125,7 +128,7 @@
         border-bottom: 1px solid #3A78DE;
     }
 
-    .button {
+    .loginPageButton {
         width: 75%;
         font: 20px Calibri;
         color: #FFFFFF;
@@ -169,13 +172,13 @@
         transition: 0.5s;
     }
 
-    #loginButton:focus span,
-    #loginButton:hover span {
+    #loginButton:focus .floating-label,
+    #loginButton:hover .floating-label {
         padding-right: 25px;
     }
 
-    #loginButton:focus span:after,
-    #loginButton:hover span:after {
+    #loginButton:focus .floating-label:after,
+    #loginButton:hover .floating-label:after {
         opacity: 1;
         right: 0;
     }
@@ -189,6 +192,7 @@
     input:focus {
         outline: none !important;
     }
+
     .inputFields {
         width: 100%;
         display: flex;

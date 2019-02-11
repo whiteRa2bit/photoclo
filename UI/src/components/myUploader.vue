@@ -1,10 +1,10 @@
 <template>
     <div class="myUploadBox">
         <div  class="vue_component__upload--image" v-bind:class="{ 'dragover': onDragover  }">
-            <span class="error" v-if="total>max_files"> Вы не можете загрузить больше {{max_files}} фотографий</span>
+            <span style="font-family: 'Lucida Console', serif;" class="error" v-if="total>max_files"> Вы не можете загрузить больше {{max_files}} фотографий</span>
             <form style="height: auto; min-height: 70vh; cursor: pointer" v-bind:id="'upload_image_form--' + input_id" enctype="multipart/form-data">
                 <div style="margin-top: 30%" v-if="total==0" class="image"></div>
-                <span style="font-size: 20px !important; color: black !important; height: 50px;" v-if="total == 0" id="id">
+                <span style="font-family: 'Lucida Console', serif;font-size: 20px !important; color: black !important; height: 50px;" v-if="total == 0" id="id">
                                                                     Переместите сюда ваши фото или просто нажмите</span>
 
                 <div class="upload_image_form__thumbnails">
@@ -19,7 +19,7 @@
                 <input type="file" v-bind:id="'upload_image_form__input--' + input_id" hidden multiple />
             </form>
             <div id="buttons">
-                <button style="width: 110px; height: 40px; margin-right: 25px; background-color: green; color: white" type="submit"
+                <button style="width: 110px; height: 40px; margin-right: 25px; background-color: #4b82d7; color: white" type="submit"
                         v-bind:class="button_class"
                         v-on:click="submit"
                         v-bind:disabled="onUploading"
@@ -300,6 +300,7 @@
                 e.preventDefault(); e.stopPropagation();
             },
             close: function(e) {
+                console.log("Try to close")
                 e.preventDefault(); e.stopPropagation();
                 this.$emit('closeModal')
             },
@@ -393,7 +394,7 @@
         margin-left: 30px;
         margin-right: 30px;
         margin-bottom: 5px;
-        border: 4px dashed forestgreen !important;
+        border: 4px dashed #4b82d7 !important;
     }
     div.image:before {
         content:url(https://i.ibb.co/Z81HczQ/Webp-net-resizeimage-3.png);
@@ -417,4 +418,4 @@
         color: red;
         text-align: left;
     }
-</style> q
+</style>

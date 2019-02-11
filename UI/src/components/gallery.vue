@@ -1,9 +1,9 @@
 <template>
     <div class="gallery">
-        <imageItem v-for="(image, index) in images" v-on:click.native='clicked(index)' v-bind:imageURL="image.url"/>
+        <imageItem v-for="(image, index) in images" v-on:click.native='clicked(index)' v-bind:imageURL="image.url" v-bind:style="styles[index]"/>
 
         <div id="myModal" class="imageModal">
-            <span class="close" id="closeImageButton">&times;</span>
+            <span class="closeCarousel" id="closeImageButton">&times;</span>
             <div class='innerContent'>
                 <div class="carouselButton" v-on:click="prev()">
                     <span >&#8249;</span>
@@ -27,17 +27,6 @@
     import imageItem from './imageItem.vue';
     import imageWBBItem from './imageWBBItem.vue';
     import axios from 'axios';
-
-    window.onload = function() {
-        var modal = document.getElementById('myModal');
-
-        var span = document.getElementById('closeImageButton'); 
-
-        span.onclick = function() {
-            this.index = null;
-            modal.style.display = "none";
-        }
-    }
 
     export default {
         name: 'gallery',
@@ -63,8 +52,9 @@
             return {
                 index: null,
                 imagenowURL: '',
-                faces: {},
-                avatarsById: {},
+                faces: [],
+                recompute: 0,
+                lastTime: 0,
             };
         },
         watch: {
@@ -74,11 +64,75 @@
             },
         },
         created: function () {
-            document.onkeydown= this.onkeydown;
+            document.onkeydown = this.onkeydown;
+            window.addEventListener('resize', this.updateStyles);
+            this.updateStyles();
+        },
+        destroyed() {
+            window.removeEventListener('resize', this.updateStyles);
+        },
+        computed: {
+            avatarsById: function() {
+                var avatarsById = {};
+                for (var i = 0; i < this.avatars.length; ++i) {
+                    avatarsById[this.avatars[i].id] = this.avatars[i];
+                }
+                return avatarsById;
+            },
+            styles: function() {
+                this.recompute;
+                var st = [];
+                var w = window.innerWidth - 10;
+                for (var i = 0; i < this.images.length; ++i) {
+                    var j = i;
+                    var sum = 0;
+                    while (j < this.images.length && (j == i || sum + Math.ceil(this.images[j].width * 200 / this.images[j].height) + 10 <= w)) {
+                        sum += Math.ceil(this.images[j].width * 200 / this.images[j].height) + 10;
+                        ++j;
+                    }
+                    var h1 = Math.floor(195 * (w - (j - i) * 10) / (sum - (j - i) * 10));
+                    if (j == this.images.length) {
+                        if (h1 < 250) {
+                            for (var k = i; k < j; ++k) {
+                                st.push('height: ' + h1 + 'px !important;');
+                            }
+                        }
+                        else {
+                            for (var k = i; k < j - 1; ++k) {
+                                st.push('height: ' + 200 + 'px !important;');
+                            }
+                            st.push('height: 200px !important; margin-right: auto !important; margin-left: 5px;');
+                        }
+                    }
+                    else {
+                        var sum2 = sum;
+                        sum2 += Math.ceil(this.images[j].width * 200 / this.images[j].height) + 10;
+                        var h2 = Math.floor(195 * (w - (j - i + 1) * 10) / (sum2 - (j - i + 1) * 10));
+                        if (Math.abs(h2 / 200 - 1) < Math.abs(h1 / 200 - 1)) {
+                            for (var k = i; k <= j; ++k) {
+                                st.push('height: ' + h2 + 'px !important;');
+                            }
+                            ++j;
+                        }
+                        else {
+                            for (var k = i; k < j; ++k) {
+                                st.push('height: ' + h1 + 'px !important;');
+                            }
+                        }
+                    }
+                    i = j - 1;
+                }
+                return st;
+            }
         },
         mounted: function () {
-            for (var avatar in this.avatars) {
-                this.avatarsById[avatar.id] = avatar;
+            var modal = document.getElementById('myModal');
+
+            var span = document.getElementById('closeImageButton'); 
+            span.onclick = function() {
+                console.log("darova");
+                this.index = null;
+                modal.style.display = "none";
             }
         },
         methods: {
@@ -87,31 +141,44 @@
                 var modal = document.getElementById('myModal');
                 modal.style.display = "flex";
             },
+            updateStyles() {
+                this.recompute += 1;
+                this.lastTime = (new Date()).getTime();
+            },
             getFaces() {
                 var this_ = this;
                 if (!this_.images || !this_.index && this.index != 0) {
                     this_.faces = {};
                     return;
                 }
-                axios.get('api/faces/' + String(this_.images[this_.index].id) + '/', { headers: {Authorization: "Token " + localStorage.token}}).then(function (response) {
+                axios.get('http://photoclo.ru:8000/api/faces/' + String(this_.images[this_.index].id) + '/', { headers: {Authorization: "Token " + localStorage.token}}).then(function (response) {
                         this_.faces = response.data.faces;
                 }).catch(function (error) {
                     this_.faces = {};
                 });
             },
+            deleteLastFaces() {
+                var arr = document.getElementsByClassName('mybbButton');
+                for (var i = 0; i < arr.length; ++i) {
+                    arr[i].style.display = "none";
+                }
+            },
             next() {
+                this.deleteLastFaces()
                 this.index += 1;
                 if (this.index == this.images.length) {
                     this.index = 0;
                 }
             },
             prev() {
+                this.deleteLastFaces()
                 this.index -= 1;
                 if (this.index < 0) {
                     this.index = this.images.length - 1;
                 }
             },
             close() {
+                this.deleteLastFaces()
                 this.index = null;
                 document.getElementById('myModal').style.display = "none";
             },
@@ -136,7 +203,7 @@
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: space-between;
-        margin: 10px;
+        margin: 5px;
     }
 
     .imageModal {
@@ -175,18 +242,23 @@
         to {transform:scale(1)}
     }
 
-    /* The Close Button */
     .close {
+        outline: none !important;
+        border: 0px !important;
+    }
+
+    /* The Close Button */
+    .closeCarousel {
         position: absolute;
         top: 10px;
         right: 20px;
-        color: #BBB;
+        color: #999 !important; 
         font-size: 30px;
         transition: 0.3s;
     }
 
-    .close:hover,
-    .close:focus {
+    .closeCarousel:hover,
+    .closeCarousel:focus {
         color: #FFF !important;
         text-decoration: none;
         cursor: pointer;
@@ -199,7 +271,7 @@
         text-align: center;
         width: 5%;
         font: 40px;
-        color: #BBB !important;
+        color: #CCC !important;
         background-color: rgba(0, 0, 0, 0) !important;
         height: 100% !important;
         font-weight: bold;

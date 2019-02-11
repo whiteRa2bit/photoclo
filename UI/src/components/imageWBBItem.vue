@@ -1,14 +1,15 @@
 <template>
     <div id="id1">
     	<div class="myContainer">
-        	<img id="image-WBB-Item" v-bind:src="image.url" alt="" />
-            <bbButton class="btn" v-for="(face, index) in faces" v-bind:face="face" v-bind:srcHeight="image.height" v-bind:srcWidth="image.width" v-bind:avatar="avatars[face.avatar]"/>
+        	<img id="image-WBB-Item" v-bind:src="'http://photoclo.ru:8000' + image.url" alt="" />
+            <bbButton class="btn" v-for="(face, index) in faces" v-bind:key="'faceInput' + face.id" v-bind:face="face" v-bind:srcHeight="image.height" v-bind:srcWidth="image.width" v-bind:avatar="avatars[face.avatar]"/>
         </div>
     </div>
 </template>
 
-<script>
+<script> 
     import bbButton from './bbButton.vue';
+    
 
 	export default {
 		name: 'imageWBBItem',
@@ -16,7 +17,6 @@
             bbButton
         },
         mounted: function() {
-            console.log(this.avatars);
         },
 		props: {
             image: {
@@ -26,9 +26,9 @@
                 }
             },
             faces: {
-                type: Object,
+                type: Array,
                 default() {
-                    return {};
+                    return [];
                 }
             },
             avatars: {

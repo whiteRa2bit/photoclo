@@ -44,13 +44,13 @@
 
 <script>
 require('es6-promise').polyfill();
-import axios from 'axios';
+import axios from 'axios'; 
 component: {axios}
 export default {
     props: {
         postURL: {
             type: String,
-            required: true
+            default: '/api/photos/'
         },
         minItems: {
             type: Number,
@@ -214,11 +214,11 @@ export default {
               }
             }
             if (this.method === 'put' || this.method === 'post' ) {
+                console.log(this.postHeader);
                 axios({method: this.method, url: this.postURL, data: this.formData,headers:this.postHeader})
                     .then((response) => {
                         this.isLoaderVisible = false;
                         this.$emit('upload-success');
-                        // Show success message
                         if(this.showHttpMessages)
                           this.successMsg = '';
                         this.removeItems();

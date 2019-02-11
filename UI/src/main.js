@@ -19,7 +19,6 @@ import { Button } from 'bootstrap-vue/es/components';
 
 Vue.use(Button);
 
-
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
