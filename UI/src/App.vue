@@ -31,11 +31,13 @@
 
                     <!--<span> myUploader.data().toClose </span>-->
                     <b-modal id="uploadModal" ref="uploadModal" hide-footer=true @hide="isModalShown=false" title="Загрузка фотографий">
-                        <myUploader ref="myUploader" v-on:closeModal="isModalShown = false;" url="http://photoclo.ru:8000/api/photos/" @upload-image-success='updateImages();' @upload-image-failure='updateImages();'> </myUploader>
+                        <myUploader ref="myUploader" v-on:closeModal="isModalShown = false;" url="http://photoclo.ru:8000/api/photos/"
+                                    @upload-image-attempt="disableUploadButton();" @
+                                    @upload-image-success='updateImages();' @upload-image-failure='updateImages();'> </myUploader>
                     </b-modal>
 
-
-                    <div class="iconDiv">
+                    <span> {{isDiskSynchronized}} </span>
+                    <div v-on:click="goToYandexDisk" class="iconDiv">
                         <div><img src="https://i.ibb.co/0cmbT5w/ya-disk.png" class="iconImg"></div>
                         <span class="iconText"> Яндекс.Диск </span>
                     </div>
@@ -142,6 +144,18 @@
                 this.isModalShown=true;
                 this.updateToken();
                 this.resetUploader()
+            },
+            disableUploadButton() {
+
+            },
+            goToYandexDisk() {
+                axios.get('http://photoclo.ru:8000/api/tokens/code/',{ headers: {Authorization: "Token " + String(this.token)}}).then(function (response) {
+                    if (!response.data.sync) {
+                        window.location.href = response.data.url;
+                    } else {
+                        console.log("Disk is already synchronized");
+                    }
+                });
             }
         },
     }
