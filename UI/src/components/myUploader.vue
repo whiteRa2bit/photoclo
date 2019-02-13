@@ -1,10 +1,10 @@
 <template>
     <div class="myUploadBox">
         <div  class="vue_component__upload--image" v-bind:class="{ 'dragover': onDragover  }">
-            <span style="font-family: 'Lucida Console', serif;" class="error" v-if="total>max_files"> Вы не можете загрузить больше {{max_files}} фотографий</span>
-            <form style="height: auto; min-height: 70vh; cursor: pointer" v-bind:id="'upload_image_form--' + input_id" enctype="multipart/form-data">
+            <span style="font-family: 'Roboto', sans-serif;" class="error" v-if="total>max_files"> Вы не можете загрузить больше {{max_files}} фотографий</span>
+            <form style="height: auto; min-height: 65vh; cursor: pointer" v-bind:id="'upload_image_form--' + input_id" enctype="multipart/form-data">
                 <div style="margin-top: 30%" v-if="total==0" class="image"></div>
-                <span style="font-family: 'Lucida Console', serif;font-size: 20px !important; color: black !important; height: 50px;" v-if="total == 0" id="id">
+                <span style="font-family: 'Roboto', sans-serif;font-size: 20px !important; color: black !important; height: 50px;" v-if="total == 0" id="id">
                                                                     Переместите сюда ваши фото или просто нажмите</span>
 
                 <div class="upload_image_form__thumbnails">
@@ -67,7 +67,7 @@
             max_files: {
                 type: Number,
                 required: false,
-                default: 10
+                default: 1000
             },
             max_filesize: {
                 type: Number,
@@ -140,10 +140,8 @@
         methods: {
             _can_xhr(){
                 if(this.total > this.max_files){
-                    console.log("Can't xhr")
                     return false;
                 }
-                console.log("Can xhr")
                 return true;
             },
             _can_upload_file(key){
@@ -156,7 +154,7 @@
             _xhr: function(formData, keys, callback){
                 const this_ = this;
                 this.onUploading = true;
-                this.$emit('upload-image-attempt', formData);
+                this.$emit('upload-image-attempt');
                 keys.forEach((key) => {
                     this.$set(this.files[key], 'attempted', true);
                 });
@@ -164,7 +162,6 @@
                     keys.forEach((key) => {
                         this.$set(this.files[key], 'uploaded', true);
                     });
-                    console.log(response);
                     this.$emit('upload-image-success', [formData, response]);
                 }, (response) => {
                     this.$emit('upload-image-failure', [formData, response]);
@@ -174,7 +171,10 @@
                 });
             },
             upload: function(){
-                if(!this._can_xhr()) return false;
+                if(!this._can_xhr()) {
+                    return false;
+                }
+                this.$emit('set-files-num', Object.keys(this.files).length);
                 for (let key in this.files) {
                     if(!this._can_upload_file(key)) continue;
                     let formData = new FormData();
@@ -182,6 +182,8 @@
                     this._xhr(formData, [key], this.upload);
                     return true;
                 }
+                this.$emit('upload-image-finish');
+
             },
             upload_batch: function(){
                 if(!this._can_xhr()) return false;
@@ -208,6 +210,7 @@
                 }
             },
             submit: function(e){
+                this.$emit('start-upload');
                 e.preventDefault(); e.stopPropagation();
                 if(!this.onUploading){
                     if(this.max_batch > 1){
@@ -216,6 +219,7 @@
                     }
                     this.upload();
                     this.$emit('closeModal');
+                    this.$emit('upload-image-finish');
                 }
             },
             dragEnter: function(e){
@@ -300,7 +304,6 @@
                 e.preventDefault(); e.stopPropagation();
             },
             close: function(e) {
-                console.log("Try to close")
                 e.preventDefault(); e.stopPropagation();
                 this.$emit('closeModal')
             },
@@ -406,6 +409,7 @@
         justify-content: space-between;
         margin-bottom: 5px;
         font-size: 25px;
+        font-family: 'Roboto', sans-serif;
     }
     #buttons {
         margin-right: 10px;
@@ -413,7 +417,8 @@
         flex-direction: row-reverse;
     }
     .error {
-        font: 15px Colibri;
+        font-size: 15px;
+        font-family: 'Roboto', sans-serif;
         width: 75%;
         color: red;
         text-align: left;

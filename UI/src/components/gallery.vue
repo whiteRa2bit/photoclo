@@ -1,25 +1,30 @@
 <template>
-    <div class="gallery">
-        <imageItem v-for="(image, index) in images" v-on:click.native='clicked(index)' v-bind:imageURL="image.url" v-bind:style="styles[index]"/>
+    <div>
+        <!--<span> {{images.length}} </span>-->
+        <div class="gallery">
+            <imageItem v-for="(image, index) in images" v-on:click.native='clicked(index)' v-bind:key="image.id" v-bind:imageURL="image.url" v-bind:style="styles[index]"/>
 
-        <div id="myModal" class="imageModal">
-            <span class="closeCarousel" id="closeImageButton">&times;</span>
-            <div class='innerContent'>
-                <div class="carouselButton" v-on:click="prev()">
-                    <span >&#8249;</span>
+            <div id="myModal" class="imageModal">
+                <span class="buttonCarousel" id="closeImageButton">&times;</span>
+                <div class="bottomButtons">
+                    <span id="deleteImageButton">Удалить</span>
+                    <span id="downloadImageButton">Загрузить</span>
                 </div>
-                <div id="overIBS">
-                    <div class="image-modal-content">
-                        <imageWBBItem id="imageBigShow" v-bind:faces="this.faces" v-bind:image="this.images[this.index]" v-bind:avatars="this.avatarsById"/>
+                <div class='innerContent'>
+                    <div class="carouselButton" id="prevButton" v-on:click="prev()">
+                        <span >&#8249;</span>
                     </div>
-                </div>
-                <div class="carouselButton" v-on:click="next()">
-                    <span>&#8250;</span>
+                    <div id="overIBS">
+                        <div class="image-modal-content">
+                            <imageWBBItem id="imageBigShow" v-bind:faces="this.faces" v-bind:image="imagesBig[index]" v-bind:avatars="this.avatarsById"/>
+                        </div>
+                    </div>
+                    <div class="carouselButton" id="nextButton" v-on:click="next()">
+                        <span>&#8250;</span>
+                    </div>
                 </div>
             </div>
         </div>
-
- 
     </div>
 </template>
 
@@ -27,6 +32,16 @@
     import imageItem from './imageItem.vue';
     import imageWBBItem from './imageWBBItem.vue';
     import axios from 'axios';
+
+    var download = function (filename) {
+        var a = document.createElement("a");
+        a.href = '';
+        a.setAttribute("download", filename);
+        var b = document.createEvent("MouseEvents");
+        b.initEvent("click", false, true);
+        a.dispatchEvent(b);
+        return false;
+    }
 
     export default {
         name: 'gallery',
@@ -36,6 +51,12 @@
         },
         props: {
             images: {
+              type: Array,
+              default () {
+                  return [];
+              }
+            },
+            imagesBig: {
               type: Array,
               default () {
                   return [];
@@ -59,6 +80,9 @@
         },
         watch: {
             index(value) {
+                console.log("lel");
+                this.imagenowURL = '';
+                console.log("kek");
                 this.imagenowURL = this.images[value];
                 this.getFaces();
             },
@@ -123,16 +147,49 @@
                     i = j - 1;
                 }
                 return st;
-            }
+            },
         },
         mounted: function () {
             var modal = document.getElementById('myModal');
 
-            var span = document.getElementById('closeImageButton'); 
-            span.onclick = function() {
-                console.log("darova");
+            var span = document.getElementById('closeImageButton');
+            span.onclick = function () {
                 this.index = null;
                 modal.style.display = "none";
+            }
+
+            var span2 = document.getElementById('deleteImageButton');
+            var span3 = document.getElementById('downloadImageButton');
+            var this_ = this;
+            span2.onclick = function () {
+                if (this_.index == null) {
+                    return;
+                }
+                var id_ = this_.images[this_.index].id;
+                this_.images.splice(this_.index, 1);
+                this_.imagesBig.splice(this_.index, 1);
+                if (this_.index == this_.images.length) {
+                    this_.index = 0;
+                }
+                this_.deleteLastFaces();
+                if (this_.images.length == 0) {
+                    this_.close();
+                }
+                // localStorage.imgNum = this.images.length;
+                axios.delete('http://photoclo.ru:8000/api/photos/' + id_ + '/', { headers: {Authorization: "Token " + localStorage.token}}).then(function (response) {
+                    console.log("deleted");
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            };
+
+            span3.onclick = function () {
+                axios.get('http://photoclo.ru:8000/api/photos/' + this_.images[this_.index].id + '/download/', { headers: {Authorization: "Token " + localStorage.token}}).then(function (response) {
+                    var url = response.data.url;
+                    download('http://photoclo.ru:8000' + url);
+                }).catch(function (error) {
+                    console.log(error);
+                });
             }
         },
         methods: {
@@ -178,7 +235,7 @@
                 }
             },
             close() {
-                this.deleteLastFaces()
+                this.deleteLastFaces();
                 this.index = null;
                 document.getElementById('myModal').style.display = "none";
             },
@@ -207,38 +264,36 @@
     }
 
     .imageModal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1; /* Sit on top */
-        padding-top: 0px; /* Location of the box */
+        display: none;
+        position: fixed;
+        z-index: 1;
+        padding-top: 0px;
         left: 0;
         top: 0;
         justify-content: space-around;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgb(0,0,0); /* Fallback color */
-        background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0,0.9);
     }
 
-    /* Modal Content (Image) */
     .image-modal-content {
         display: flex;
         justify-content: space-around;
         alignment-baseline: central;
         width: 100%;
         height: auto;
-        max-height: 
+        max-height:
     }
-    
-    /* Add Animation - Zoom in the Modal */
-    .image-modal-content { 
+
+    .image-modal-content {
         animation-name: zoom;
         animation-duration: 0.6s;
     }
 
     @keyframes zoom {
-        from {transform:scale(0)} 
+        from {transform:scale(0)}
         to {transform:scale(1)}
     }
 
@@ -247,18 +302,43 @@
         border: 0px !important;
     }
 
-    /* The Close Button */
-    .closeCarousel {
+    .buttonCarousel {
         position: absolute;
-        top: 10px;
-        right: 20px;
-        color: #999 !important; 
-        font-size: 30px;
+        color: #999 !important;
+        font-size: 31px;
         transition: 0.3s;
     }
 
-    .closeCarousel:hover,
-    .closeCarousel:focus {
+    #closeImageButton {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+    }
+
+    #deleteImageButton,
+    #downloadImageButton {
+        color: #AAA !important;
+        font-size: 15px;
+        margin: 5px;
+    }
+
+    #deleteImageButton:hover,
+    #deleteImageButton:focus,
+    #downloadImageButton:hover,
+    #downloadImageButton:focus {
+        color: #FFF !important;
+        cursor: pointer;
+    }
+
+    .bottomButtons {
+        position: absolute;
+        transition: 0.3s;
+        bottom: 5px;
+        width: auto;
+    }
+
+    .buttonCarousel:hover,
+    .buttonCarousel:focus {
         color: #FFF !important;
         text-decoration: none;
         cursor: pointer;
@@ -268,8 +348,9 @@
         display: flex;
         flex-direction: column;
         justify-content: space-around;
+        overflow: visible;
         text-align: center;
-        width: 5%;
+        width: 100% !important;
         font: 40px;
         color: #CCC !important;
         background-color: rgba(0, 0, 0, 0) !important;
@@ -280,24 +361,33 @@
 
     .carouselButton:hover,
     .carouselButton:focus {
-        color: #FFF;
+        color: #FFF !important;
         text-decoration: none;
         cursor: pointer;
+    }
+
+    #prevButton span {
+        position: absolute;
+        left: 10px;
+    }
+
+    #nextButton span {
+        position: absolute;
+        right: 10px;
     }
 
     .innerContent {
         width: 100%;
         height: 100%;
         display: flex;
-        justify-content: space-between;
-        alignment-baseline: central;
+        text-align: center;
     }
 
     #overIBS {
         display: flex;
         flex-direction: column;
         justify-content: space-around;
-        width: 100%;
+        width: auto;
         height: 100%;
         max-height: 100vh;
     }
